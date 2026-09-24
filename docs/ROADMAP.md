@@ -23,9 +23,9 @@ Also worth weighing: the throttle is per-user, so load on nba.com scales linearl
 
 ### Hard timing constraint
 
-`currentSeason()` rolls to `2026-27` in July, but the season does not tip off until roughly October, and Yahoo year-prefixes finished seasons (`/2025/nba/<league>/players`) so the content script does not inject on them. Between now and October there is no Yahoo page to inject on and no nba.com data to inject.
+`currentSeason()` rolls to `2026-27` in July. Yahoo opened 2026-27 leagues in mid-August under the un-prefixed URL (`/nba/<league>/players`), so the content script injects again (confirmed on v0.2.2, 2026-09-15). Only finished seasons are year-prefixed (`/2025/nba/<league>/players`) and skipped, as intended. But nba.com has no stats for a season with no games played, so until tip-off (roughly October) the overlay is correctly blank.
 
-Practical effect: the extension cannot be demoed, screenshotted or smoke-tested end to end until a live 2026-27 league exists. The Web Store requires at least one screenshot (1280x800 or 640x400) and we have none, only icons. October is therefore the earliest realistic submission date whatever we build first.
+Practical effect: the extension cannot be demoed, screenshotted or smoke-tested end to end until 2026-27 games have been played. The Web Store requires at least one screenshot (1280x800 or 640x400) and we have none, only icons. October is therefore the earliest realistic submission date whatever we build first.
 
 ### Pre-launch checklist
 
@@ -33,7 +33,6 @@ Ordered by what actually matters for handing this to strangers.
 
 | Item | Why | Size |
 |---|---|---|
-| No `LICENSE` file | `package.json` declares MIT and `CLAUDE.md` promises a LICENSE, but none exists, so the default is all rights reserved and nobody has a grant to use or redistribute it | Minutes |
 | No `action` key | Clicking the toolbar icon does nothing. Store-installed users get no signal it works, since it only appears on two Yahoo pages. A minimal popup buys more here than a full Options page | Small |
 | Content script over-injects | The `/nba/*/*` match subsumes the two specific patterns, so the script plus a `subtree: true` MutationObserver load on every Yahoo fantasy NBA page. Feature code no-ops correctly, so this is wasted surface and per-mutation overhead, not a vulnerability. The README also says it "only fires on" Players and My Team, true of features but not of injection | Small |
 | Latent `innerHTML` sink | `src/ui/spider-tooltip.ts:127` interpolates `anchor.textContent` into `innerHTML`. Not exploitable in practice (player names carry no HTML metacharacters, and it is overwritten via `textContent` at line 181) but it is the one place page data reaches an HTML sink | Two lines |

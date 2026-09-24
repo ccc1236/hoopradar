@@ -6,7 +6,7 @@ Project conventions and technical context for AI coding agents working in this r
 
 HoopRadar is a Chromium MV3 extension that overlays advanced metrics (eFG%, TS%, USG%) from nba.com/stats onto Yahoo Fantasy Basketball pages, plus adds game-based time windows (Last 5, Last 10) and per-mode filters (Per 36, Per 100 poss) that Yahoo does not natively support.
 
-Tech stack: TypeScript (strict + `noUncheckedIndexedAccess`), Vite, `@crxjs/vite-plugin`, Vanilla Web Components for UI (no React or chart libs in v1), Vitest with `fake-indexeddb` for tests, GitHub Actions for CI.
+Tech stack: TypeScript (strict + `noUncheckedIndexedAccess`), Vite, `@crxjs/vite-plugin`, plain DOM plus shadow DOM for UI (no React, no chart libs, no custom elements), Vitest with `fake-indexeddb` for tests, GitHub Actions for CI.
 
 ## Workflow
 
@@ -26,11 +26,10 @@ docs/superpowers/plans/    Implementation plans (the "how", TDD-driven)
 docs/SMOKE.md              Manual pre-release smoke checklist
 src/background/            Service worker and its modules
 src/shared/                Types, message contracts, config (columns, windows, perModes)
-src/content/, src/pages/   Yahoo content script (Plan 2+)
-src/ui/                    Web Components (filter bar, tooltip, options) (Plan 2+)
+src/content/, src/pages/   Yahoo content script and per-page logic (Players, My Team)
+src/ui/                    Shadow-DOM UI factories (filter bar, spider tooltip, wrong-tab banner)
 rules/                     declarativeNetRequest static rule files
 test/unit/                 Vitest unit tests, one per source module
-test/fixtures/             Saved HTML snapshots of Yahoo pages (Plan 2+)
 .github/workflows/         CI
 ```
 
@@ -48,7 +47,7 @@ For any module with logic (anything that is not pure config or static JSON), fol
 
 The plan format already encodes this as numbered steps with fenced code blocks. Treat plan code blocks as authoritative. If you find a real issue with a plan step, stop and surface it before deviating.
 
-The only file in Plan 1 that has no unit tests is `src/background/index.ts`. It is verified via the `docs/SMOKE.md` checklist instead, because mocking the entire SW environment costs more than it pays back.
+The entry points (`src/background/index.ts`, `src/content/index.ts`) have no unit tests. They are verified via the `docs/SMOKE.md` checklist instead, because mocking the entire SW environment costs more than it pays back.
 
 ## Before committing
 
@@ -92,7 +91,7 @@ The filter bar, cache keys, table columns, and tooltip rows all read from these 
 
 **`chrome.runtime.sendMessage` called from inside the same SW does not loop back** to that SW's `onMessage` listener. It dispatches to other contexts (content scripts, popups). For SW-internal smoke tests, call handlers directly via `hoopradar.*` debug handles instead.
 
-**Yahoo player IDs are not NBA player IDs.** The Yahoo to NBA mapping is built once per season via `buildMapping(yahoo, nba)` in `src/background/playerMapping.ts` and persisted in `chrome.storage.local` keyed by season string (e.g. `hoopradar.mapping.2025-26`). The actual bootstrap that fetches both lists is deferred to Plan 2 because it requires Yahoo DOM scraping that only a content script can do. The matcher (`buildMapping`) ships in Plan 1 and is independently testable.
+**Yahoo player IDs are not NBA player IDs.** The Yahoo to NBA mapping is built once per season via `buildMapping(yahoo, nba)` in `src/background/playerMapping.ts` and persisted in `chrome.storage.local` keyed by season string (e.g. `hoopradar.mapping.2025-26`). The content script scrapes the Yahoo players and sends `bootstrapPlayers`; `bootstrapPlayers` in `src/background/mappingService.ts` fetches the NBA list and runs the matcher. `buildMapping` is pure and independently testable.
 
 **The NBA player list (`commonallplayers`) is cached once per season and only refreshed when the filter bar's Refresh button is clicked** (which sends `bootstrapPlayers` with `forceFresh: true`). Without that user action, a player who joins an active roster mid-season after the cache was first built will never be mapped, even on subsequent page loads. We do not filter on `ROSTERSTATUS` either: injured, two-way, and G-League-assigned players are still included as long as their `TEAM_ABBREVIATION` is populated, because the mapping algorithm in `playerMapping.ts` already requires a Yahoo-side team match to land a hit.
 
@@ -132,7 +131,6 @@ In scope:
 
 Deferred (v2 or later, listed in the spec's Future Work):
 
-- Spider/radar tooltip view.
 - Matchup and draft pages (different DOM, SPA routing).
 - Injury alerts from external sources.
 - Custom column picker UI.
