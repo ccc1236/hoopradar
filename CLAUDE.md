@@ -33,7 +33,7 @@ test/unit/                 Vitest unit tests, one per source module
 .github/workflows/         CI
 ```
 
-Each source file has one clear responsibility. Keep files small and focused. The service worker entry (`src/background/index.ts`) is the only file that wires modules together.
+Each source file has one clear responsibility. Keep files small and focused. Only the two entry points wire modules together: `src/background/index.ts` for the service worker and `src/content/index.ts` for the content script.
 
 ## TDD discipline
 
@@ -127,7 +127,7 @@ In scope:
 
 - The two Yahoo pages explicitly listed in the spec (`/team`, `/players`).
 - The three advanced columns (eFG%, TS%, USG%), three windows, three per-modes.
-- The hover-preview-plus-click-to-pin tooltip with the Season vs L5 vs L10 table.
+- The hover-preview-plus-click-to-pin spider tooltip (Season, L10, L5 overlaid), which replaced the planned table tooltip.
 
 Deferred (v2 or later, listed in the spec's Future Work):
 
