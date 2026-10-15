@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.3 - 2026-10-15
+
+Fixes the My Team page, which showed nothing at all in the 2026-27 season.
+
+- Yahoo's My Team URL changed shape for 2026-27 (`/nba/<league>/<team>/team` instead of `/nba/<league>/<team>`). HoopRadar did not recognise it, so neither the overlay nor the "switch tab" banner appeared. Both URL shapes now work.
+- Yahoo also added a date picker whose prev/next arrows link to the same tab as the Average Stats season sub-tab and sit ahead of it on the page. HoopRadar mistook an arrow for the sub-tab, so it kept showing the banner even on Average Stats > 2026-27 Season, and the banner's switch button followed the arrow's link. It now picks the real sub-tab.
+- Until games are played the columns show dashes. That is expected.
+
 ## v0.2.2 - 2026-08-19
 
 Packaging fix: updating no longer wipes your settings.
