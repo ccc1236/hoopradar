@@ -40,6 +40,21 @@ describe("detectMyTeamTab", () => {
     expect(r.switchToSubTab?.id).toBe("sub-AS-season");
   });
 
+  it("ignores the date-picker arrows, whose hrefs also carry the season stat2 param", () => {
+    // Since 2026-27 Yahoo renders prev/next-day arrows ahead of the tab nav.
+    // They are bare anchors (no <li>) linking to the current tab state.
+    document.body.innerHTML = `
+      <a class="Js-prev" href="/nba/624/1/team?date=2026-10-20&stat1=AS&stat2=AS_2026"></a>
+      <a class="Js-next" href="/nba/624/1/team?date=2026-10-22&stat1=AS&stat2=AS_2026"></a>
+      <ul><li class="Navitem Ta-c Selected"><a id="top-AS" href="/nba/624/1/team?stat1=AS">Average Stats</a></li></ul>
+      <ul>
+        <li class="Navitem  Selected"><a id="sub-AS-season" href="/nba/624/1/team?stat1=AS&stat2=AS_2026">2026-27 Season</a></li>
+        <li class="Navitem Default-selected "><a href="/nba/624/1/team?stat1=AS&stat2=AS_2025">2025-26</a></li>
+      </ul>
+    `;
+    expect(detectMyTeamTab("2026-27")).toEqual({ kind: "ready" });
+  });
+
   it("ignores the identically-labelled '2025-26 Season' anchor in the Stats subnav", () => {
     document.body.innerHTML = NAV;
     const r = detectMyTeamTab("2025-26");

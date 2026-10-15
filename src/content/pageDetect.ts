@@ -7,8 +7,10 @@ export interface PageInfo {
 
 const HOST = "basketball.fantasysports.yahoo.com";
 // My Team URLs use either the literal "team" or a numeric team ID
-// (e.g. /nba/9144/1). The Players page is always literal "players".
-const ROUTE_RE = /^\/nba\/([^/]+)\/(team|players|\d+)\/?$/;
+// (e.g. /nba/9144/1), and since the 2026-27 season also the numeric ID
+// followed by "/team" (e.g. /nba/624/1/team). The Players page is always
+// literal "players".
+const ROUTE_RE = /^\/nba\/([^/]+)\/(team|players|\d+(?:\/team)?)\/?$/;
 
 export function detectPage(href: string): PageInfo {
   let url: URL;

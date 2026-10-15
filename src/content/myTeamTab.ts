@@ -71,7 +71,11 @@ function findAverageStatsSeasonSubTab(seasonString: string): HTMLAnchorElement |
   // seasonString is "YYYY-YY". The start year is the part before the dash.
   const startYear = seasonString.split("-")[0];
   if (!startYear) return null;
-  return document.querySelector<HTMLAnchorElement>(`a[href*="stat2=AS_${startYear}"]`);
+  // The date picker's prev/next arrows link to the same stat2 and come first
+  // in the DOM, but they are bare anchors. Prefer the one inside an <li>
+  // (the real sub-tab), falling back to the first match.
+  const sel = `a[href*="stat2=AS_${startYear}"]`;
+  return document.querySelector<HTMLAnchorElement>(`li ${sel}`) ?? document.querySelector<HTMLAnchorElement>(sel);
 }
 
 export function detectMyTeamTab(seasonString: string): MyTeamTabState {

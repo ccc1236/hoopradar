@@ -10,6 +10,10 @@ describe("detectPage", () => {
     expect(detectPage("https://basketball.fantasysports.yahoo.com/nba/9144/1"))
       .toEqual({ kind: "myTeam", leagueId: "9144" });
   });
+  it("identifies the My Team page (numeric team ID plus /team, with query)", () => {
+    expect(detectPage("https://basketball.fantasysports.yahoo.com/nba/624/1/team?&date=2026-10-20&stat1=AS&stat2=AS_2026"))
+      .toEqual({ kind: "myTeam", leagueId: "624" });
+  });
   it("identifies the Players page", () => {
     expect(detectPage("https://basketball.fantasysports.yahoo.com/nba/123456/players"))
       .toEqual({ kind: "players", leagueId: "123456" });
