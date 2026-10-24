@@ -2,26 +2,33 @@ import { describe, it, expect } from "vitest";
 import { buildShadingPayload, sampleInfoFor } from "../../src/background/shadingBaseline.js";
 import type { PlayerStatRow } from "../../src/shared/types.js";
 
-function r(id: number, team: string, gp: number, minTotal: number, stats: Record<string, number | null>): PlayerStatRow {
-  return { nbaId: id, name: `P${id}`, teamAbbr: team, position: null, stats: { ADV_GP: gp, ADV_MIN: minTotal, ...stats } };
+function r(id: number, team: string, gp: number, mpg: number, stats: Record<string, number | null>): PlayerStatRow {
+  return { nbaId: id, name: `P${id}`, teamAbbr: team, position: null, stats: { ADV_GP: gp, ADV_MIN: mpg, ...stats } };
 }
 
 /** n established SAS players (12 GP, 30 MPG) with the given EFG_PCT values. */
 function established(values: number[]): PlayerStatRow[] {
-  return values.map((v, i) => r(100 + i, "SAS", 12, 360, { EFG_PCT: v }));
+  return values.map((v, i) => r(100 + i, "SAS", 12, 30, { EFG_PCT: v }));
 }
 
 describe("sampleInfoFor", () => {
+  it("reads Advanced MIN as minutes per game, not a season total", () => {
+    // Live 2026-27 data: Javonte Green, 2 GP, Advanced MIN 15.5 equals Base
+    // PerGame MIN 15.5 and does not change under Per36.
+    const green: PlayerStatRow = { nbaId: 9, name: "Green", teamAbbr: "NYK", position: null, stats: { ADV_GP: 2, ADV_MIN: 15.5 } };
+    expect(sampleInfoFor(green, 2)).toEqual({ small: false, gp: 2, teamGames: 2, mpg: 15.5 });
+  });
+
   it("flags fewer than 25% of team games as small", () => {
-    expect(sampleInfoFor(r(1, "SAS", 2, 60, {}), 12)).toEqual({ small: true, gp: 2, teamGames: 12, mpg: 30 });
+    expect(sampleInfoFor(r(1, "SAS", 2, 30, {}), 12)).toEqual({ small: true, gp: 2, teamGames: 12, mpg: 30 });
   });
 
   it("flags under 8 MPG as small even with plenty of games", () => {
-    expect(sampleInfoFor(r(1, "SAS", 18, 126, {}), 20).small).toBe(true);
+    expect(sampleInfoFor(r(1, "SAS", 18, 7, {}), 20).small).toBe(true);
   });
 
   it("does not flag 25% of games at 8 MPG exactly", () => {
-    expect(sampleInfoFor(r(1, "SAS", 3, 24, {}), 12).small).toBe(false);
+    expect(sampleInfoFor(r(1, "SAS", 3, 8, {}), 12).small).toBe(false);
   });
 
   it("treats missing or zero GP as small without throwing", () => {
@@ -33,7 +40,7 @@ describe("sampleInfoFor", () => {
 
 describe("buildShadingPayload", () => {
   it("uses the team's highest GP as team games", () => {
-    const rows = [...established(Array(24).fill(0.5)), r(1, "SAS", 2, 60, { EFG_PCT: 0.5 })];
+    const rows = [...established(Array(24).fill(0.5)), r(1, "SAS", 2, 30, { EFG_PCT: 0.5 })];
     const p = buildShadingPayload(rows, { y: rows[24]! });
     expect(p.sampleByYahooId.y).toEqual({ small: true, gp: 2, teamGames: 12, mpg: 30 });
   });

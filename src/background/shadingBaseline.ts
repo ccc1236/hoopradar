@@ -11,12 +11,14 @@ function num(v: number | null | undefined): number {
 
 /**
  * Small sample = fewer than 25% of the team's games in the window, OR under
- * 8 minutes per game in the games played. Uses the merge's ADV_GP / ADV_MIN
- * (PerMode-independent totals), so the verdict is the same in every PerMode.
+ * 8 minutes per game in the games played. Uses the merge's ADV_GP / ADV_MIN:
+ * Advanced MIN is already minutes per game and, unlike Base MIN, stays the
+ * same in every PerMode (verified against live 2026-27 data), so the verdict
+ * is the same in every PerMode.
  */
 export function sampleInfoFor(row: PlayerStatRow, teamGames: number): SampleInfo {
   const gp = num(row.stats.ADV_GP);
-  const mpg = gp > 0 ? num(row.stats.ADV_MIN) / gp : 0;
+  const mpg = gp > 0 ? num(row.stats.ADV_MIN) : 0;
   return { small: gp < SMALL_GP_SHARE * teamGames || mpg < SMALL_MPG, gp, teamGames, mpg };
 }
 
