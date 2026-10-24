@@ -22,6 +22,7 @@ function mockSendMessage(playerCount: number): void {
         type: "getPlayerStatsResponse",
         byYahooId: byYahooId as GetPlayerStatsResponse["byYahooId"],
         fetchedAt: Date.now(),
+        shading: { baseline: {}, sampleByYahooId: {} },
       };
       return r;
     }

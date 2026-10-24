@@ -233,7 +233,7 @@ async function paint(table: HTMLTableElement, bar: FilterBarHandle, settings: Fi
     bar.setStatus(`${resp.code}`, "error");
     return;
   }
-  renderColumns(table, resp.byYahooId);
+  renderColumns(table, resp.byYahooId, resp.shading);
   if (sortInfo) reSortBy(table, sortInfo);
   bar.setStatus(`Updated ${new Date().toLocaleTimeString()}`);
 }
@@ -310,7 +310,7 @@ export async function run(_info: PageInfo): Promise<{ teardown: () => void }> {
       bar.setStatus(`${r.code}`, "error");
       return;
     }
-    renderColumns(table, r.byYahooId);
+    renderColumns(table, r.byYahooId, r.shading);
     if (sortInfo) reSortBy(table, sortInfo);
     bar.setStatus(`Updated ${new Date().toLocaleTimeString()}`);
   };

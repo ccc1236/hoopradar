@@ -2,6 +2,7 @@ import type { PerModeKey, PlayerStatRow, SeasonString, WindowKey, YahooPlayerId 
 import type { YahooPlayer } from "../background/playerMapping.js";
 import type { FilterSettings } from "./settings.js";
 import type { GetSpiderDataRequest, GetSpiderDataResponse } from "./spider.js";
+import type { ShadingPayload } from "./shading.js";
 
 export const WINDOW_KEYS: readonly WindowKey[] = ["Season", "Last5", "Last10"];
 export const PER_MODE_KEYS: readonly PerModeKey[] = ["PerGame", "Per36", "Per100Possessions"];
@@ -19,6 +20,8 @@ export interface GetPlayerStatsResponse {
   type: "getPlayerStatsResponse";
   byYahooId: Record<YahooPlayerId, PlayerStatRow | null>;
   fetchedAt: number;
+  /** League baseline and per-player sample info for the shaded advanced columns. */
+  shading: ShadingPayload;
 }
 
 export interface ErrorResponse {

@@ -28,6 +28,7 @@ import {
 import { loadSettings, saveSettings } from "../shared/settings.js";
 import type { PlayerStatRow, WindowKey, PerModeKey, YahooPlayerId } from "../shared/types.js";
 import { buildSpiderData } from "./spiderService.js";
+import { buildShadingPayload } from "./shadingBaseline.js";
 import { log } from "../shared/logger.js";
 
 const cache = new Cache({ dbName: "hoopradar", defaultTtlMs: 6 * 60 * 60 * 1000 });
@@ -97,6 +98,7 @@ async function handleGetPlayerStats(req: GetPlayerStatsRequest): Promise<MsgResp
       type: "getPlayerStatsResponse",
       byYahooId,
       fetchedAt: Date.now(),
+      shading: buildShadingPayload(rows, byYahooId),
     };
     return response;
   } catch (e) {

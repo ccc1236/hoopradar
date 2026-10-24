@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderColumns, clearHoopradarCells } from "../../src/content/injectColumns.js";
 import type { PlayerStatRow } from "../../src/shared/types.js";
+import type { ShadingPayload } from "../../src/shared/shading.js";
 
 const SAMPLE: Record<string, PlayerStatRow | null> = {
   "6014": {
@@ -340,5 +341,70 @@ describe("renderColumns", () => {
     expect((body.lastElementChild as HTMLElement).className).toContain("Spacer");
     const bodyCells = Array.from(body.children);
     expect(bodyCells[bodyCells.length - 2]?.getAttribute("data-hoopradar")).toBe("USG_PCT");
+  });
+});
+
+describe("renderColumns shading", () => {
+  const SHADING: ShadingPayload = {
+    baseline: { EFG_PCT: { mean: 0.563, sd: 0.05 }, TS_PCT: { mean: 0.517, sd: 0.05 }, USG_PCT: null },
+    sampleByYahooId: { "6014": { small: true, gp: 2, teamGames: 12, mpg: 6 }, "404": null },
+  };
+  const cell = (t: HTMLTableElement, id: string, key: string): HTMLElement =>
+    t.querySelector<HTMLElement>(`tr:has(a[data-ys-playerid="${id}"]) td[data-hoopradar="${key}"]`)!;
+
+  beforeEach(() => { document.body.innerHTML = ""; });
+
+  it("fills advanced cells from the baseline", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE, SHADING);
+    expect(cell(t, "6014", "EFG_PCT").style.backgroundColor).toBe("rgb(249, 229, 149)");
+    expect(cell(t, "6014", "TS_PCT").style.backgroundColor).toBe("rgb(125, 187, 136)");
+    expect(cell(t, "6014", "USG_PCT").style.backgroundColor).toBe("");
+  });
+
+  it("marks small samples with a dot and hover text on shaded cells", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE, SHADING);
+    for (const key of ["EFG_PCT", "TS_PCT"]) {
+      const c = cell(t, "6014", key);
+      expect(c.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
+      expect(c.title).toBe("Small sample: 2 of 12 team games, 6.0 MPG");
+    }
+    expect(cell(t, "6014", "USG_PCT").querySelector("[data-hoopradar-dot]")).toBeNull();
+  });
+
+  it("keeps the value text readable next to the dot", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE, SHADING);
+    expect(cell(t, "6014", "EFG_PCT").textContent).toBe(".563");
+  });
+
+  it("leaves unmapped players unshaded and dot-free", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE, SHADING);
+    for (const key of ["EFG_PCT", "TS_PCT", "USG_PCT"]) {
+      const c = cell(t, "404", key);
+      expect(c.textContent).toBe("-");
+      expect(c.style.backgroundColor).toBe("");
+      expect(c.querySelector("[data-hoopradar-dot]")).toBeNull();
+      expect(c.title).toBe("");
+    }
+  });
+
+  it("does not stack dots or keep fills across re-renders", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE, SHADING);
+    renderColumns(t, SAMPLE, SHADING);
+    expect(cell(t, "6014", "EFG_PCT").querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
+    renderColumns(t, SAMPLE);
+    expect(t.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(0);
+    expect(cell(t, "6014", "EFG_PCT").style.backgroundColor).toBe("");
+  });
+
+  it("renders as before when no shading is passed", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE);
+    expect(cell(t, "6014", "TS_PCT").style.backgroundColor).toBe("");
+    expect(t.querySelector("[data-hoopradar-dot]")).toBeNull();
   });
 });

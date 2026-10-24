@@ -7,6 +7,19 @@ import {
 import { formatStat } from "../shared/format.js";
 import type { PlayerStatRow, YahooPlayerId } from "../shared/types.js";
 import { cellAtColumn, columnOf } from "./yahoo.js";
+import { colorFor, sampleTitle } from "./shading.js";
+import type { SampleInfo, ShadingPayload } from "../shared/shading.js";
+
+/** Corner dot plus hover text on a shaded cell whose player is a small sample. */
+function markSmallSample(td: HTMLElement, sample: SampleInfo): void {
+  td.style.position = "relative";
+  td.title = sampleTitle(sample);
+  const dot = document.createElement("span");
+  dot.dataset.hoopradarDot = "1";
+  dot.style.cssText =
+    "position:absolute;top:4px;left:4px;width:6px;height:6px;border-radius:50%;background:#333;pointer-events:none";
+  td.appendChild(dot);
+}
 
 const GROUP_HEADER_LABEL = "Advanced";
 
@@ -73,6 +86,7 @@ function buildHeaderIndex(table: HTMLTableElement): Map<string, number> {
 export function renderColumns(
   table: HTMLTableElement,
   data: Record<YahooPlayerId, PlayerStatRow | null>,
+  shading?: ShadingPayload,
 ): void {
   clearHoopradarCells(table);
 
@@ -108,11 +122,17 @@ export function renderColumns(
     const yahooId = getYahooIdFromRow(row);
     const stats = yahooId ? data[yahooId]?.stats ?? null : null;
 
+    const sample = yahooId ? shading?.sampleByYahooId[yahooId] ?? null : null;
     for (const col of ADVANCED_COLUMNS) {
       const td = document.createElement("td");
       td.dataset.hoopradar = col.key;
       td.textContent = formatStat(stats?.[col.key] ?? null, col.decimals, col.multiplier);
       td.style.textAlign = "end";
+      const fill = colorFor(col.key, stats?.[col.key], shading?.baseline[col.key]);
+      if (fill) {
+        td.style.backgroundColor = fill;
+        if (sample?.small) markSmallSample(td, sample);
+      }
       insertBeforeSpacerOrAppend(row, td);
     }
 
