@@ -23,6 +23,22 @@ describe("mergeBaseAndAdvanced", () => {
     expect(merged.stats.USG_PCT).toBe(0.289);
   });
 
+  it("keeps Advanced GP and MIN under ADV_ keys even though Base overwrites GP and MIN", () => {
+    const base = [row(1, "P", { GP: 10, MIN: 3.0, PTS: 4 })];
+    const adv = [row(1, "P", { GP: 10, MIN: 30, USG_PCT: 0.3 })];
+    const m = mergeBaseAndAdvanced(base, adv).get(1)!;
+    expect(m.stats.MIN).toBe(3.0);
+    expect(m.stats.GP).toBe(10);
+    expect(m.stats.ADV_MIN).toBe(30);
+    expect(m.stats.ADV_GP).toBe(10);
+  });
+
+  it("does not invent ADV_ keys for a Base-only row", () => {
+    const m = mergeBaseAndAdvanced([row(2, "B", { GP: 3, MIN: 5 })], []).get(2)!;
+    expect(m.stats.ADV_MIN).toBeUndefined();
+    expect(m.stats.ADV_GP).toBeUndefined();
+  });
+
   it("keeps an Advanced-only row when Base is missing the player", () => {
     const base: PlayerStatRow[] = [];
     const adv = [row(1, "Two-Way Player", { EFG_PCT: 0.5 })];

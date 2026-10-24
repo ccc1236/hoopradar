@@ -20,7 +20,12 @@ export function mergeBaseAndAdvanced(
 ): Map<number, PlayerStatRow> {
   const byNbaId = new Map<number, PlayerStatRow>();
   for (const row of adv) {
-    byNbaId.set(row.nbaId, { ...row, stats: { ...row.stats } });
+    const stats = { ...row.stats };
+    // Base overwrites GP and MIN below, but Advanced's are PerMode-independent
+    // totals, which the small-sample rule needs (MPG = ADV_MIN / ADV_GP).
+    if (row.stats.GP !== undefined) stats.ADV_GP = row.stats.GP;
+    if (row.stats.MIN !== undefined) stats.ADV_MIN = row.stats.MIN;
+    byNbaId.set(row.nbaId, { ...row, stats });
   }
   for (const row of base) {
     const existing = byNbaId.get(row.nbaId);
