@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { findStatsTable, scrapePlayers } from "../../src/content/yahoo.js";
+import { cellAtColumn, columnOf, findStatsTable, scrapePlayers } from "../../src/content/yahoo.js";
 
 const FIXTURE_DIR = resolve(__dirname, "../fixtures/yahoo");
 
@@ -49,5 +49,31 @@ describe("yahoo scraper - My Team page", () => {
 
   it("each scraped player has a numeric Yahoo id", () => {
     expect(scrapePlayers().every((p) => /^\d+$/.test(p.yahooId))).toBe(true);
+  });
+});
+
+describe("column helpers (colspan-aware)", () => {
+  function mkRows(): { head: HTMLTableRowElement; body: HTMLTableRowElement } {
+    document.body.innerHTML = `
+      <table>
+        <thead><tr><th>Players</th><th colspan="2">Action</th><th>PTS</th></tr></thead>
+        <tbody><tr><td>Luka</td><td>trade</td><td>star</td><td>33.5</td></tr></tbody>
+      </table>`;
+    return {
+      head: document.querySelector<HTMLTableRowElement>("thead tr")!,
+      body: document.querySelector<HTMLTableRowElement>("tbody tr")!,
+    };
+  }
+
+  it("columnOf counts preceding colspans", () => {
+    const { head } = mkRows();
+    expect(columnOf(head.children[2]!)).toBe(3);
+    expect(columnOf(head.children[1]!)).toBe(1);
+  });
+
+  it("cellAtColumn returns the body cell occupying that column", () => {
+    const { head, body } = mkRows();
+    expect(cellAtColumn(body, columnOf(head.children[2]!))?.textContent).toBe("33.5");
+    expect(cellAtColumn(body, 99)).toBeNull();
   });
 });

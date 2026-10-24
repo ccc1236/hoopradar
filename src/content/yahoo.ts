@@ -20,6 +20,31 @@ export function findStatsTable(): HTMLTableElement | null {
 }
 
 /**
+ * Visual column a cell starts at, counting the colspans before it. Yahoo's
+ * header rows can span body cells (e.g. one "Action" <th colspan=2> over the
+ * trade and watch icons on another manager's team page), so a header's
+ * position among its siblings is not the body cell index.
+ */
+export function columnOf(cell: Element): number {
+  let col = 0;
+  for (let c = cell.previousElementSibling; c; c = c.previousElementSibling) {
+    col += (c as HTMLTableCellElement).colSpan || 1;
+  }
+  return col;
+}
+
+/** The cell in `row` that occupies visual column `col`, or null. */
+export function cellAtColumn(row: Element, col: number): HTMLElement | null {
+  let start = 0;
+  for (const c of Array.from(row.children)) {
+    const span = (c as HTMLTableCellElement).colSpan || 1;
+    if (col < start + span) return c as HTMLElement;
+    start += span;
+  }
+  return null;
+}
+
+/**
  * Scrape a player from a row. Skips rows that lack a player anchor, a valid
  * Yahoo player id, a non-empty name, or a recognizable team abbreviation.
  */

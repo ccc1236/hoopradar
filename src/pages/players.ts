@@ -1,4 +1,4 @@
-import { scrapePlayers, findStatsTable } from "../content/yahoo.js";
+import { scrapePlayers, findStatsTable, cellAtColumn, columnOf } from "../content/yahoo.js";
 import { renderColumns, clearHoopradarCells } from "../content/injectColumns.js";
 import { createFilterBar, type FilterBarHandle } from "../ui/filter-bar.js";
 import { createSpiderTooltipController, type SpiderTooltipHandle } from "../ui/spider-tooltip.js";
@@ -147,8 +147,8 @@ interface SortInfo {
   direction: "asc" | "desc";
 }
 
-function cellNumeric(row: HTMLTableRowElement, idx: number): number | null {
-  const cell = row.children[idx] as HTMLElement | undefined;
+function cellNumeric(row: HTMLTableRowElement, column: number): number | null {
+  const cell = cellAtColumn(row, column);
   if (!cell) return null;
   const text = (cell.textContent ?? "").trim();
   if (!text || text === "-") return null;
@@ -167,9 +167,9 @@ function detectActiveSort(table: HTMLTableElement): SortInfo | null {
   const headRows = table.querySelectorAll("thead tr");
   const labelRow = headRows.length > 0 ? headRows[headRows.length - 1]! : null;
   if (!labelRow) return null;
-  const headers = Array.from(labelRow.children);
-  const columnIndex = headers.findIndex((h) => h.classList?.contains("Selected"));
-  if (columnIndex < 0) return null;
+  const sorted = Array.from(labelRow.children).find((h) => h.classList?.contains("Selected"));
+  if (!sorted) return null;
+  const columnIndex = columnOf(sorted);
 
   const tbody = table.querySelector("tbody");
   if (!tbody) return null;

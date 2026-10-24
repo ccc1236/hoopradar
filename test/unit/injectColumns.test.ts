@@ -69,6 +69,26 @@ describe("renderColumns", () => {
     expect(ptsCell.hasAttribute("data-hoopradar-override")).toBe(true);
   });
 
+  it("maps headers to body cells by column, not by cell, when a header spans two cells", () => {
+    // Another manager's team page: "Action" is one <th colspan=2> over two
+    // body cells (trade icon, watch star), so header cell N is body cell N+1.
+    document.body.innerHTML = `
+      <table>
+        <thead>
+          <tr><th>Players</th><th colspan="2">Action</th><th>PTS</th><th>REB</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><a data-ys-playerid="6014" title="Luka">Luka</a></td><td></td><td></td><td><div>99.9</div></td><td><div>50.0</div></td></tr>
+        </tbody>
+      </table>`;
+    const t = document.querySelector("table")!;
+    renderColumns(t, SAMPLE);
+    const lukaRow = t.querySelector('tr:has(a[data-ys-playerid="6014"])')!;
+    expect(lukaRow.children[3]!.textContent).toBe("33.5");
+    expect(lukaRow.children[4]!.textContent).toBe("7.7");
+    expect(lukaRow.children[2]!.textContent).toBe("");
+  });
+
   it("overrides Yahoo's FTM and FTA cells (separate columns, FTA header has a trailing *)", () => {
     document.body.innerHTML = `
       <table>

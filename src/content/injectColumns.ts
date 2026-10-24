@@ -6,6 +6,7 @@ import {
 } from "../shared/columns.js";
 import { formatStat } from "../shared/format.js";
 import type { PlayerStatRow, YahooPlayerId } from "../shared/types.js";
+import { cellAtColumn, columnOf } from "./yahoo.js";
 
 const GROUP_HEADER_LABEL = "Advanced";
 
@@ -33,7 +34,9 @@ function insertBeforeSpacerOrAppend(row: Element, cell: Element): void {
 }
 
 /**
- * Build label-to-column-index map from the LAST `<thead>` row. Yahoo wraps
+ * Build label-to-column map from the LAST `<thead>` row. Values are visual
+ * columns (colspan-aware, see `columnOf`); resolve body cells with
+ * `cellAtColumn`, never `row.children[i]`. Yahoo wraps
  * headers as `<th><div><a>PTS</a></div></th>`. We strip:
  *   - Private-Use-Area Unicode (U+E000-U+F8FF), where Yahoo's icon font
  *     renders the active-sort arrow glyph (e.g., `PTS`). Without this,
@@ -46,13 +49,13 @@ function buildHeaderIndex(table: HTMLTableElement): Map<string, number> {
   const labelRow = rows.length > 0 ? rows[rows.length - 1]! : null;
   const map = new Map<string, number>();
   if (!labelRow) return map;
-  Array.from(labelRow.children).forEach((cell, i) => {
+  Array.from(labelRow.children).forEach((cell) => {
     const text = (cell.textContent ?? "")
       .replace(/[-]/g, "")
       .trim()
       .replace(/\*+$/, "")
       .trim();
-    if (text) map.set(text, i);
+    if (text) map.set(text, columnOf(cell));
   });
   return map;
 }
@@ -119,7 +122,7 @@ export function renderColumns(
         if (!yahooLabel) continue;
         const idx = headerIndex.get(yahooLabel);
         if (idx === undefined) continue;
-        const cell = row.children[idx] as HTMLElement | undefined;
+        const cell = cellAtColumn(row, idx);
         if (!cell) continue;
         // Yahoo wraps cell content in a `<div>`; target it so we don't clobber the wrapper.
         const inner = cell.querySelector("div");
@@ -132,7 +135,7 @@ export function renderColumns(
       for (const col of COMPOUND_OVERRIDE_COLUMNS) {
         const idx = headerIndex.get(col.yahooHeader);
         if (idx === undefined) continue;
-        const cell = row.children[idx] as HTMLElement | undefined;
+        const cell = cellAtColumn(row, idx);
         if (!cell) continue;
         const make = stats[col.makeKey];
         const att = stats[col.attemptKey];
@@ -152,7 +155,7 @@ export function renderColumns(
       for (const col of DERIVED_OVERRIDE_COLUMNS) {
         const idx = headerIndex.get(col.yahooHeader);
         if (idx === undefined) continue;
-        const cell = row.children[idx] as HTMLElement | undefined;
+        const cell = cellAtColumn(row, idx);
         if (!cell) continue;
         const num = stats[col.numeratorKey];
         const den = stats[col.denominatorKey];
