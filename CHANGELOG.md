@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.5 - 2026-10-24
+
+New: colour shading on the eFG%, TS% and USG% columns, on Players and on My Team.
+
+- eFG% and TS% cells are shaded in soft pastels from red (poor) through yellow (league average) to green (elite), reaching full colour two standard deviations from the average. Efficient shooters stand out without reading every number.
+- USG% uses its own light-to-deeper blue scale, because high usage is a role rather than good or bad. A low-minutes player with deep blue is heavily involved whenever he plays.
+- The league average and spread are computed live from nba.com data for the selected window (Season, L10, L5), leaving out small samples so garbage-time lines do not skew them. Per Game, Per 36 and Per 100 do not change these three stats, so the colours stay put when you switch.
+- Small samples (under 25% of the team's games, or under 8 minutes a game) are still shaded but get a small dark dot on the USG% cell. Hover it for the details, for example `Small sample: 2 of 12 team games, 6.0 MPG`.
+- Early in a season the spread is wide, so most cells sit near yellow for the first week or two. When there is too little data, cells are left unshaded.
+
 ## v0.2.4 - 2026-10-24
 
 Fixes stat values landing one column to the left on other managers' team pages.
