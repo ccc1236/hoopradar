@@ -198,7 +198,7 @@ Smoke-passes if all 7 steps succeed.
 1. On Players, eFG% and TS% cells show pastel fills from red through yellow (league average) to green. USG% cells show light to deeper blue. Text stays dark and readable on every fill.
 2. A low-minutes or rarely used player shows a small dark dot in the top-left of each shaded cell. Hovering reads like `Small sample: 2 of 12 team games, 6.0 MPG`.
 3. Switch Season, L10, L5: colours change (each window has its own baseline).
-4. Switch Per Game, Per 36, Per 100: colours and dots stay the same. If every player suddenly gets a dot under Per 36 or Per 100, the Advanced minutes assumption is wrong (see the 2026-10-24 shading design).
+4. Switch Per Game, Per 36, Per 100: colours and dots stay the same. If the shading disappears entirely in any PerMode (no fills, no dots), the Advanced minutes assumption is wrong: every player is being judged a small sample, which leaves no baseline (see the 2026-10-24 shading design).
 5. Unmapped players and players with no nba.com row show a plain `-` with no fill and no dot.
 6. Repeat 1 and 2 on My Team, Average Stats > current season.
 
