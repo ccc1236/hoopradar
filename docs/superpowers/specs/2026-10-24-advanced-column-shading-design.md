@@ -66,7 +66,7 @@ Full colour is reached at +/-2 standard deviations (the user agreed to 2 rather 
 
 ### Small-sample marker
 
-A small dark dot (about 6px, `#333`) in the top-left corner of each of the three cells, colour unchanged. Hovering the cell shows text like: `Small sample: 2 of 12 team games, 6.0 MPG`.
+A small dark dot (about 6px, `#333`) in the top-left corner of the USG% cell only, colour unchanged: sample size is per player, so one marker per row (user decision after testing, 2026-10-24; originally one dot on each of the three cells). Hovering that cell shows text like: `Small sample: 2 of 12 team games, 6.0 MPG`. If the USG% cell is unshaded, the player shows no dot.
 
 ### Small-sample rule
 

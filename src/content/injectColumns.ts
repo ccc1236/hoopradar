@@ -10,6 +10,9 @@ import { cellAtColumn, columnOf } from "./yahoo.js";
 import { colorFor, sampleTitle } from "./shading.js";
 import type { SampleInfo, ShadingPayload } from "../shared/shading.js";
 
+/** The one advanced column that carries the small-sample dot. */
+const SAMPLE_MARKER_KEY = "USG_PCT";
+
 /** Corner dot plus hover text on a shaded cell whose player is a small sample. */
 function markSmallSample(td: HTMLElement, sample: SampleInfo): void {
   td.style.position = "relative";
@@ -131,7 +134,8 @@ export function renderColumns(
       const fill = colorFor(col.key, stats?.[col.key], shading?.baseline[col.key]);
       if (fill) {
         td.style.backgroundColor = fill;
-        if (sample?.small) markSmallSample(td, sample);
+        // Sample size is per player, so one marker per row is enough.
+        if (sample?.small && col.key === SAMPLE_MARKER_KEY) markSmallSample(td, sample);
       }
       insertBeforeSpacerOrAppend(row, td);
     }

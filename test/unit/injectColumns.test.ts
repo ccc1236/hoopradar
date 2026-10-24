@@ -362,15 +362,28 @@ describe("renderColumns shading", () => {
     expect(cell(t, "6014", "USG_PCT").style.backgroundColor).toBe("");
   });
 
-  it("marks small samples with a dot and hover text on shaded cells", () => {
+  const ALL_SHADED: ShadingPayload = {
+    ...SHADING,
+    baseline: { ...SHADING.baseline, USG_PCT: { mean: 0.2, sd: 0.05 } },
+  };
+
+  it("marks a small sample once per player, on the USG% cell only", () => {
+    const t = mkTable();
+    renderColumns(t, SAMPLE, ALL_SHADED);
+    const usg = cell(t, "6014", "USG_PCT");
+    expect(usg.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
+    expect(usg.title).toBe("Small sample: 2 of 12 team games, 6.0 MPG");
+    for (const key of ["EFG_PCT", "TS_PCT"]) {
+      expect(cell(t, "6014", key).querySelector("[data-hoopradar-dot]")).toBeNull();
+      expect(cell(t, "6014", key).title).toBe("");
+    }
+    expect(t.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
+  });
+
+  it("shows no dot when the USG% cell is unshaded", () => {
     const t = mkTable();
     renderColumns(t, SAMPLE, SHADING);
-    for (const key of ["EFG_PCT", "TS_PCT"]) {
-      const c = cell(t, "6014", key);
-      expect(c.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
-      expect(c.title).toBe("Small sample: 2 of 12 team games, 6.0 MPG");
-    }
-    expect(cell(t, "6014", "USG_PCT").querySelector("[data-hoopradar-dot]")).toBeNull();
+    expect(t.querySelector("[data-hoopradar-dot]")).toBeNull();
   });
 
   it("keeps the value text readable next to the dot", () => {
@@ -393,9 +406,9 @@ describe("renderColumns shading", () => {
 
   it("does not stack dots or keep fills across re-renders", () => {
     const t = mkTable();
-    renderColumns(t, SAMPLE, SHADING);
-    renderColumns(t, SAMPLE, SHADING);
-    expect(cell(t, "6014", "EFG_PCT").querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
+    renderColumns(t, SAMPLE, ALL_SHADED);
+    renderColumns(t, SAMPLE, ALL_SHADED);
+    expect(t.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
     renderColumns(t, SAMPLE);
     expect(t.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(0);
     expect(cell(t, "6014", "EFG_PCT").style.backgroundColor).toBe("");
