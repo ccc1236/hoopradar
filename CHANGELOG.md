@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.4 - 2026-10-24
+
+Fixes stat values landing one column to the left on other managers' team pages.
+
+- On another manager's team page Yahoo adds an "Action" column whose single header spans two cells (the trade and watch icons). HoopRadar matched headers to cells by counting cells, so every overridden stat after it was written one column to the left (A/T values showed under TO, and so on). Headers and cells are now matched by column position, so spanning headers no longer throw the layout off. Your own team page was never affected.
+- The Players page re-sort used the same cell counting and would have sorted by the wrong column on a table with a spanning header. Fixed the same way.
+
 ## v0.2.3 - 2026-10-15
 
 Fixes the My Team page, which showed nothing at all in the 2026-27 season.
