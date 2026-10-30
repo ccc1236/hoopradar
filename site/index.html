@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HoopRadar - advanced stats for Yahoo Fantasy Basketball</title>
+  <meta name="description" content="A free Chrome extension that puts eFG%, TS%, USG% and Last 5 / Last 10 form on your Yahoo Fantasy Basketball pages.">
+  <meta name="theme-color" content="#b9521f">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hoopradar.app/">
+  <meta property="og:title" content="HoopRadar: see who's under the radar">
+  <meta property="og:description" content="Your league sees points. A free Chrome extension that puts eFG%, TS%, USG% and Last 5 / Last 10 form on your Yahoo Fantasy Basketball pages.">
+  <meta property="og:image" content="https://hoopradar.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="HoopRadar logo with the line: Your league sees points. You see who's under the radar.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hoopradar.app/og.png">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="version.js"></script>
+</head>
+<body>
+<div class="page">
+  <div class="leather top" aria-hidden="true"></div>
+
+  <main class="board">
+    <svg class="sketch" viewBox="0 0 128 128" aria-hidden="true">
+      <defs>
+        <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="1.3"/></filter>
+      </defs>
+      <g filter="url(#rough)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <line class="d" style="--d:.3s;--t:.25s" pathLength="1" x1="48" y1="108" x2="80" y2="108" stroke="#2D4A5B" stroke-width="1.8"/>
+        <circle class="d" style="--d:.5s;--t:.35s" pathLength="1" cx="64" cy="96" r="7" stroke="#2D4A5B" stroke-width="1.4" transform="rotate(-90 64 96)"/>
+        <path class="d" style="--d:.85s;--t:.7s" pathLength="1" d="M 24 80 Q 64 -18 104 80" stroke="#2D4A5B" stroke-width="1.8"/>
+        <g stroke="#e0552b" stroke-width="1.5">
+          <path class="pop" style="--d:1.7s" d="M40 52 l6 6 m0 -6 l-6 6"/>
+          <path class="pop" style="--d:1.85s" d="M82 52 l6 6 m0 -6 l-6 6"/>
+        </g>
+        <g stroke="#2D4A5B" stroke-width="1.2">
+          <circle class="pop" style="--d:2.05s" cx="30" cy="70" r="4"/>
+          <circle class="pop" style="--d:2.15s" cx="98" cy="70" r="4"/>
+          <path class="d" style="--d:2.4s;--t:.5s" pathLength="1" d="M32 64 Q 38 36 58 22"/>
+          <path class="d" style="--d:3.2s;--t:.6s" pathLength="1" d="M64 26 C 46 44, 80 62, 64 84"/>
+          <path class="fade" style="--d:3.75s" d="M59 80 L64 86 L69 80"/>
+        </g>
+        <circle class="pop" style="--d:1.5s" cx="64" cy="16" r="3.2" fill="#2D4A5B" stroke="none"/>
+      </g>
+    </svg>
+
+    <div class="content">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 128 128" role="img" aria-label="HoopRadar logo">
+          <defs>
+            <radialGradient id="bluemoon" cx="50%" cy="38%" r="68%">
+              <stop offset="0%" stop-color="#4A6E84"/>
+              <stop offset="60%" stop-color="#2D4A5B"/>
+              <stop offset="100%" stop-color="#1F3645"/>
+            </radialGradient>
+          </defs>
+          <rect class="tile" width="128" height="128" rx="24" fill="url(#bluemoon)"/>
+          <line class="d" style="--d:.3s;--t:.25s" pathLength="1" x1="48" y1="108" x2="80" y2="108" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+          <circle class="d" style="--d:.5s;--t:.35s" pathLength="1" cx="64" cy="96" r="7" fill="none" stroke="#fff" stroke-width="3" transform="rotate(-90 64 96)"/>
+          <path class="d" style="--d:.85s;--t:.7s" pathLength="1" d="M 24 80 Q 64 -18 104 80" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <g class="play" style="--out:4.6s">
+            <g fill="none" stroke="#ff8a3d" stroke-width="2.4" stroke-linecap="round">
+              <path class="pop" style="--d:1.7s" d="M40 52 l6 6 m0 -6 l-6 6"/>
+              <path class="pop" style="--d:1.85s" d="M82 52 l6 6 m0 -6 l-6 6"/>
+            </g>
+            <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".9">
+              <circle class="pop" style="--d:2.05s" cx="30" cy="70" r="4"/>
+              <circle class="pop" style="--d:2.15s" cx="98" cy="70" r="4"/>
+              <path class="d" style="--d:2.4s;--t:.5s" pathLength="1" d="M32 64 Q 38 36 58 22"/>
+              <path class="d" style="--d:3.2s;--t:.6s" pathLength="1" d="M64 26 C 46 44, 80 62, 64 84"/>
+              <path class="fade" style="--d:3.75s" d="M59 80 L64 86 L69 80"/>
+            </g>
+          </g>
+          <circle class="pop" style="--d:1.5s" cx="64" cy="16" r="5" fill="#fff"/>
+        </svg>
+        HoopRadar
+      </div>
+
+      <p class="kicker">Your league sees points.</p>
+      <h1>You see who's <span>under the radar</span>.</h1>
+      <p class="lede">A free Chrome extension that puts eFG%, TS%, USG% and Last 5 / Last 10 form on your Yahoo Fantasy Basketball pages.</p>
+
+      <a class="cta" href="https://github.com/ccc1236/hoopradar/releases">
+        Download on GitHub
+        <small data-latest hidden></small>
+      </a>
+      <p class="note">Free and open source. Installs on desktop Chrome, Edge or Brave.</p>
+    </div>
+  </main>
+
+  <footer class="leather">Not affiliated with Yahoo or the NBA.</footer>
+</div>
+</body>
+</html>
