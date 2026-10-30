@@ -42,7 +42,7 @@ The first version of this spec described a multi-section page (features, mock ta
 ## Constraints
 
 - **Location:** `site/` at the repo root. Nothing under `src/` or `public/`; the extension build, typecheck and tests are unaffected.
-- **Hosting:** Cloudflare Pages, connected to the GitHub repo, no build command, output directory `site`, project name `hoopradar`, so the address is `https://hoopradar.pages.dev`. `hoopradar.com` is taken; a custom domain may come later. The user sets up the Cloudflare project.
+- **Hosting:** Cloudflare Pages, connected to the GitHub repo, no build command, output directory `site`, project name `hoopradar`. The address is `https://hoopradar.app` (bought by the user 2026-10-30 through Cloudflare Registrar, 2 years; also the user's Yahoo team name). `https://hoopradar.pages.dev` stays live as a fallback. The user sets up the Cloudflare project and connects the custom domain.
 - **External requests:** exactly one, from the visitor's browser to `https://api.github.com/repos/ccc1236/hoopradar/releases/latest`, for the version line (the user agreed to this). Nothing else: no CDN fonts, scripts, images or analytics. System font stack.
 - **Accessibility:** animations honour `prefers-reduced-motion: reduce` by showing their final frames. Text contrast passes on both the whiteboard and the leather bars.
 - **Phone width:** no horizontal scroll at 360px; 16px side gutters.
@@ -68,7 +68,7 @@ Generated SVG tile (mockup source `.superpowers/brainstorm/pebble-tile.svg`), co
 On load, a small inline script requests the latest release from the GitHub API and fills in `tag_name` and `published_at` (formatted like "24 Oct 2026"). If the request fails, is rate limited, or returns no release, the second line stays hidden and the button still works. The button always links to the releases page, not to a specific asset.
 
 ### Link preview
-Open Graph and Twitter card (`summary_large_image`) tags: title, description, and a 1200x630 PNG (logo, kicker and headline, leather strip, whiteboard feel) committed in `site/`. `og:url`, `og:image` and `twitter:image` are absolute on `https://hoopradar.pages.dev`; `site/README.md` says exactly what to change if the domain moves. Favicon from the blue moon logo.
+Open Graph and Twitter card (`summary_large_image`) tags: title, description, and a 1200x630 PNG (logo, kicker and headline, leather strip, whiteboard feel) committed in `site/`. `og:url`, `og:image` and `twitter:image` are absolute on `https://hoopradar.app`; `site/README.md` covers connecting the custom domain in Cloudflare Pages (project > Custom domains > add `hoopradar.app`) and says exactly what to change if the domain ever moves. Favicon from the blue moon logo.
 
 ## README changes (the content the page dropped)
 
