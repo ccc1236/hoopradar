@@ -2,168 +2,116 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** A one-page static site in `site/` that introduces HoopRadar, links prominently to the GitHub releases page, and explains install, updating and limitations, deployable to Cloudflare Pages with no build step.
+Revised 2026-10-30 for the single-screen splash (replaces the multi-section plan of 2026-10-24).
 
-**Architecture:** One `site/index.html` with inline SVG (animated logo, whiteboard sketch, mock radar card) and one `site/styles.css`. A Vitest guard test parses the HTML with `jsdom` and checks the requirements that can silently regress (links, meta tags, no external requests, no dashes, sections present). The preview image is rendered once from an SVG with `sharp` by a manual script, like `scripts/rasterize-icons.mjs`.
+**Goal:** A single-screen splash page in `site/` (leather bars, whiteboard, animated logo, one "Download on GitHub" button with the latest version from GitHub), plus README additions carrying the features, screenshots, install notes and FAQ the page no longer has.
 
-**Tech Stack:** HTML, CSS, SVG; Vitest + jsdom (already dev dependencies) for the guard test; sharp for the one-off PNG.
+**Architecture:** `site/index.html` with inline SVG (animated logo, whiteboard play) and a small inline script for the version line; `site/styles.css`; `site/leather.svg` as a repeating background. The version-line logic is a pure function in `site/version.js` (ES module, imported by the page and by the test). A Vitest guard test parses the page with `jsdom`. The preview PNG is rendered once from SVG with `sharp` by `scripts/render-og.mjs`.
+
+**Tech Stack:** HTML, CSS, SVG, a few lines of browser JS; Vitest + jsdom; sharp (all existing dev dependencies).
 
 **Spec:** `docs/superpowers/specs/2026-10-24-landing-site-design.md`
 
 ## Global Constraints
 
-- Everything for the site lives in `site/`, except the guard test (`test/unit/site.test.ts`) and the preview renderer (`scripts/render-og.mjs`). Nothing under `src/` or `public/`; `vite.config.ts`, `manifest.json` and `package.json` unchanged.
-- No em dash (U+2014) or en dash (U+2013) in any file under `site/`, in the test, the script, or commit messages.
-- No external requests from the page: no `<script src>`, no stylesheet, font, image or `url()` from another origin. Plain `<a href>` links to other sites are fine. No analytics. System font stack.
-- Releases URL, exactly: `https://github.com/ccc1236/hoopradar/releases`
-- Repo URL: `https://github.com/ccc1236/hoopradar`; changelog: `https://github.com/ccc1236/hoopradar/blob/main/CHANGELOG.md`
-- Site address: `https://hoopradar.pages.dev` (used only in `og:url`, `og:image`, `twitter:image`).
-- Colours: background `#10151f`, accent `#ff8a3d`, logo gradient `#4A6E84 -> #2D4A5B -> #1F3645`, whiteboard ink `#2D4A5B`.
-- Footer text, exactly: "HoopRadar is an independent project, not affiliated with Yahoo or the NBA."
-- No Yahoo, NBA or team logos; no real screenshots; no real league, team or manager names; no divac mark.
-- Do not mention why it is not on the Chrome Web Store beyond "Not on the Chrome Web Store yet".
-- No horizontal scroll at 360px width; 16px side gutters; animations honour `prefers-reduced-motion: reduce` by showing the final frame.
-- Feature facts must match `README.md` and `CHANGELOG.md`.
-- Commits as `ccc1236 <145925203+ccc1236@users.noreply.github.com>` (repo default), ending with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
-- Before every commit: `npm run typecheck`, `npm test`, `npm run build` all pass.
+- Site files live in `site/`. Also allowed: `test/unit/site.test.ts`, `scripts/render-og.mjs`, `docs/images/*`, `README.md`. Nothing under `src/` or `public/`; `vite.config.ts`, `manifest.json`, `package.json` unchanged.
+- No em dash (U+2014) or en dash (U+2013) in any created or edited file or commit message.
+- The only network request the page makes: `fetch("https://api.github.com/repos/ccc1236/hoopradar/releases/latest")`. No other external scripts, stylesheets, fonts, images or `url()`. System font stack.
+- Releases URL, exactly: `https://github.com/ccc1236/hoopradar/releases`. Site address: `https://hoopradar.pages.dev`.
+- Copy, exactly: kicker "Your league sees points."; headline "You see who's under the radar." with "under the radar" in a `<span>` coloured `#ff8a3d`; line "A free Chrome extension that puts eFG%, TS%, USG% and Last 5 / Last 10 form on your Yahoo Fantasy Basketball pages."; button label "Download on GitHub"; version line "Latest: v0.2.5, released 24 Oct 2026" format; footer "Not affiliated with Yahoo or the NBA."
+- Colours: ink `#22313d`, accent `#ff8a3d`, board `#f4f2ec`, logo gradient `#4A6E84 -> #2D4A5B -> #1F3645`, sketch ink `#2D4A5B`, X's `#e0552b`, seam `#1b1310`, footer text `#fff3e6`.
+- No Yahoo, NBA, team or ball-maker logos; no real names; no divac mark; nothing about why it is not on the Chrome Web Store beyond "Not on the Chrome Web Store yet".
+- No horizontal scroll at 360px; 16px gutters; `prefers-reduced-motion: reduce` shows final frames.
+- Commits as `ccc1236 <145925203+ccc1236@users.noreply.github.com>`, ending with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Before each commit: `npm run typecheck`, `npm test`, `npm run build` pass.
 
 ## Review Focus
 
-1. Phone width (360px): the mock stats table is wider than the screen. Expected: the table scrolls inside its own container, the page itself never scrolls sideways. Checked in Task 5 Step 3 (browser, `document.documentElement.scrollWidth <= 360`).
-2. Reduced motion: someone with reduced motion on must see the finished logo and whiteboard immediately, not a blank tile. Guard test asserts the `prefers-reduced-motion` rule exists (Task 1); visual check in Task 5.
-3. Link preview on X: relative or wrong-host `og:image` gives a card with no image and no local symptom. Guard test asserts absolute URLs on the agreed host and that the image file exists (Task 1 and Task 5).
-4. Visitor on a phone tapping "Download": the extension is desktop only. Expected: a short note near the button that it installs on desktop Chrome, Edge or Brave. Asserted in Task 1's test.
-5. Logo final frame drifting from the shipped logo: after the animation the mark must match `docs/logo-samples/D-bluemoon-gradient.svg` (same path `d`, circle positions, line). Guard test compares the attributes (Task 1).
+1. GitHub API down, rate limited (403), or no releases (404): the button must still show and work, with the version line hidden. Pinned by `formatLatest` tests in Task 1 (null on bad input) and the browser check in Task 3.
+2. Short laptop screens (1366x650) and phones (360x640): content must not be cut off or overlap the sketch unreadably; if it does not fit, the page scrolls vertically rather than clipping. Checked in Task 3 Step 3.
+3. Reduced motion: logo, sketch and text visible immediately, not stuck at opacity 0. Guard test asserts the media rule (Task 1); visual check in Task 3.
+4. Link preview: absolute `og:image` on the agreed host, and the file exists at 1200x630. Tests in Task 1 and Task 3.
+5. Logo final frame matches the shipped logo (path `d`, circle and line attributes). Test in Task 1.
 
 ---
 
-### Task 1: Guard test, page shell, hero with animated logo, footer
+### Task 1: The splash page
 
 **Files:**
-- Create: `test/unit/site.test.ts`
-- Create: `site/index.html`, `site/styles.css`, `site/favicon.svg`, `site/README.md`
-
-**Interfaces:**
-- Produces: `site/index.html` structure later tasks fill in: `<header class="hero">`, then `<main>` holding `<section id="what">`, `<section id="see">`, `<section id="install">`, `<section id="update">`, `<section id="faq">` (empty placeholders with an `<h2>` each are fine in this task), then `<footer>`.
-- Produces: in the test file, helpers `loadDoc(): Document` (reads `site/index.html`, returns `new JSDOM(html).window.document`) and `siteFiles(): string[]` (all files under `site/`, recursive). Later tasks append `it(...)` blocks using them.
-- Produces CSS custom properties on `:root`: `--bg`, `--fg`, `--muted`, `--accent`, `--card`, `--ink`.
-
-- [ ] **Step 1: Write the failing test** `test/unit/site.test.ts` (node environment; `import { JSDOM } from "jsdom"`; read files with `node:fs`). Tests:
-  - `hero links to the releases page`: `doc.querySelector(".hero a.cta")?.getAttribute("href")` equals the releases URL.
-  - `hero notes desktop only`: `.hero` textContent matches `/desktop/i`.
-  - `has every section`: ids `what`, `see`, `install`, `update`, `faq` each exist and contain an `h2`.
-  - `footer carries the non-affiliation note`: `footer` textContent contains the exact footer text.
-  - `link preview tags are absolute on the agreed host`: `meta[property="og:url"]` content is `https://hoopradar.pages.dev/`; `og:image` and `meta[name="twitter:image"]` start with `https://hoopradar.pages.dev/`; `meta[name="twitter:card"]` is `summary_large_image`; `og:title` and `og:description` non-empty; `meta[name="viewport"]` exists.
-  - `makes no external requests`: no `script[src]`; every `link[href]` except `rel="canonical"` is a relative path; every `img[src]`, `source[src]`, `[style*="url("]` is relative; `styles.css` contains no `url(` with `http` and no `@import`.
-  - `contains no em or en dashes`: for every file in `siteFiles()` with extension `.html`, `.css`, `.svg`, `.md`, content does not match a regex of the two code points U+2013 and U+2014 (write them as escapes in the test source, never literally).
-  - `honours reduced motion`: `styles.css` contains `prefers-reduced-motion: reduce`.
-  - `animated logo ends on the shipped logo`: in `.hero svg.logo`, a `path` with `d="M 24 80 Q 64 -18 104 80"`, a `circle` with `cx="64" cy="16" r="5"`, a `circle` with `cx="64" cy="96" r="7"`, and a `line` with `x1="48" y1="108" x2="80" y2="108"` all exist.
-
-- [ ] **Step 2: Run** `npx vitest run test/unit/site.test.ts`. Expected: FAIL, ENOENT for `site/index.html`.
-
-- [ ] **Step 3: Build the shell.**
-  - `site/favicon.svg`: copy of `docs/logo-samples/D-bluemoon-gradient.svg`.
-  - `site/index.html`: `<!doctype html>`, `lang="en"`, charset, viewport, `<title>HoopRadar - advanced stats for Yahoo Fantasy Basketball</title>`, meta description, Open Graph and Twitter tags per the test (image `https://hoopradar.pages.dev/og.png`, 1200x630, with `og:image:width/height` and alt), favicon link, `styles.css`.
-  - Hero: the animated logo as inline `<svg class="logo" viewBox="0 0 128 128" role="img" aria-label="HoopRadar logo">`, ported from card 1 of `.superpowers/brainstorm/130-1792813655/content/logo-anim.html` (tile fades in, backboard, hoop, arc draw via `pathLength="1"` dash offset, ball pops, orange X's and white pass and cut play draw in then fade out, about 5 s, plays once). Gradient id must not collide with the whiteboard's ids in Task 2. Beside or under it: an `h1` (start from "See who's <span>actually</span> good."), one line saying it is a free Chrome extension that adds advanced stats to Yahoo Fantasy Basketball's Players and My Team pages, the `a.cta` "Download from GitHub", and a small note such as "Free, open source. Installs on desktop Chrome, Edge or Brave."
-  - Footer: links to the repo, the changelog, "MIT licence", and the footer text.
-  - `site/styles.css`: tokens above, system font stack, mobile-first layout with 16px gutters and a max content width around 1040px, hero stacks on phones and goes side by side from about 720px. Animation classes (`.d` draw, `.pop`, `.fade`, `.play` fade-out) live here, plus a `@media (prefers-reduced-motion: reduce)` block that removes animations and shows final states (the play group hidden, everything else visible).
-  - `site/README.md`: what the folder is; Cloudflare Pages settings (connect the GitHub repo, production branch `main`, framework preset None, build command empty, build output directory `site`); local preview (open `site/index.html`, or `npx serve site`); to change the domain, edit the three meta tags `og:url`, `og:image`, `twitter:image` in `index.html`; how to regenerate `og.png` (`node scripts/render-og.mjs`, added in Task 5).
-
-- [ ] **Step 4: Run** `npx vitest run test/unit/site.test.ts`. Expected: PASS, all listed tests green (sections can be placeholders).
-
-- [ ] **Step 5: Run** `npm run typecheck && npm test && npm run build`. Expected: all pass, `dist/` contains no `site` files.
-
-- [ ] **Step 6: Commit** `feat(site): landing page shell with animated logo hero`.
-
-### Task 2: "What it does" with the whiteboard sketch
-
-**Files:**
-- Modify: `site/index.html` (`#what`), `site/styles.css`
+- Create: `site/index.html`, `site/styles.css`, `site/version.js`, `site/leather.svg`, `site/favicon.svg`, `site/README.md`
 - Test: `test/unit/site.test.ts`
 
 **Interfaces:**
-- Consumes: `loadDoc()`, `#what` section, CSS tokens from Task 1.
+- Produces: `export function formatLatest(release: unknown): string | null` in `site/version.js`. Returns `"Latest: <tag_name>, released <D Mon YYYY>"` (day without leading zero, English short month, UTC date of `published_at`) when `release` is an object with string `tag_name` and a parseable `published_at`; otherwise `null`.
+- Produces: in the test file, `loadDoc(): Document` and `siteFiles(): string[]` helpers, reused by Task 3.
+- Produces: `.cta small[data-latest]`, the element the script fills (hidden attribute until filled).
 
-- [ ] **Step 1: Add failing test** `what section lists the four features beside the whiteboard`: `#what svg.whiteboard` exists; `#what li` count is 4; `#what` textContent contains `eFG%`, `TS%`, `USG%`, `Last 5`, `Last 10`, `Per 36`, `Per 100`, and matches `/radar/i`.
+- [ ] **Step 1: Write the failing test** `test/unit/site.test.ts` (node environment, `import { JSDOM } from "jsdom"`, `node:fs`; import `formatLatest` from `../../site/version.js` and add a sibling `site/version.d.ts` declaring it so `npm run typecheck` passes). Tests:
+  - `formatLatest formats a release`: `formatLatest({ tag_name: "v0.2.5", published_at: "2026-10-24T09:00:00Z" })` equals `"Latest: v0.2.5, released 24 Oct 2026"`.
+  - `formatLatest rejects bad input`: returns `null` for `null`, `{}`, `{ message: "Not Found" }`, `{ tag_name: "v1", published_at: "nope" }`.
+  - `button links to the releases page`: `a.cta` href equals the releases URL and its text contains "Download on GitHub"; it contains `small[data-latest]` with the `hidden` attribute.
+  - `copy matches the spec`: document text contains the kicker, "You see who's", the `h1 span` text is "under the radar", the one line, "desktop", and `footer` contains "Not affiliated with Yahoo or the NBA."
+  - `link preview tags`: `og:url` is `https://hoopradar.pages.dev/`; `og:image` and `twitter:image` are `https://hoopradar.pages.dev/og.png`; `twitter:card` is `summary_large_image`; `og:title`, `og:description`, `meta[name=viewport]` present.
+  - `only GitHub API is contacted`: no `script[src]` other than relative ones; every `link[href]` relative; every `img[src]` relative; `styles.css` has no `http` inside `url(` and no `@import`; across all `site/` `.html` and `.js` files, every `https://` URL other than the releases URL, repo URL, `https://hoopradar.pages.dev/...` and `https://api.github.com/repos/ccc1236/hoopradar/releases/latest` appears only in `<a href>` (in practice: none).
+  - `no dashes`: no file in `siteFiles()` with `.html`, `.css`, `.js`, `.svg`, `.md` contains U+2013 or U+2014 (escape them in the regex source).
+  - `reduced motion`: `styles.css` contains `prefers-reduced-motion: reduce`.
+  - `logo ends on the shipped logo`: inside `svg.logo`: `path[d="M 24 80 Q 64 -18 104 80"]`, `circle[cx="64"][cy="16"][r="5"]`, `circle[cx="64"][cy="96"][r="7"]`, `line[x1="48"][y1="108"][x2="80"][y2="108"]`.
 
-- [ ] **Step 2: Run** the site test. Expected: FAIL on `svg.whiteboard`.
-
-- [ ] **Step 3: Implement.** Whiteboard SVG ported from card 2 of the mockup file (off-white board, turbulence/displacement filter, ink `#2D4A5B`, orange-red X's, play stays drawn); unique ids. Four points, facts per the spec's "What it does" list (shaded columns with small-sample dot; L5/L10 are games the player played, unlike Yahoo's day-based filter; Per 36 / Per 100 as well as Per Game; hover radar card comparing Season, L10 and L5, click to pin). Two columns from about 720px, stacked on phones. Optional: start the sketch's draw animation when it scrolls into view with a tiny inline `IntersectionObserver` that adds a class; without JS or with reduced motion, the final frame shows.
-
-- [ ] **Step 4: Run** the site test. Expected: PASS.
-
-- [ ] **Step 5: Run** the three-command chain, then commit `feat(site): what-it-does section with whiteboard sketch`.
-
-### Task 3: "See it" mock table and radar card
-
-**Files:**
-- Modify: `site/index.html` (`#see`), `site/styles.css`
-- Test: `test/unit/site.test.ts`
-
-**Interfaces:**
-- Consumes: `loadDoc()`, `#see`.
-
-- [ ] **Step 1: Add failing tests.**
-  - `see section shows a shaded mock table`: `#see table` exists, has header cells with text `eFG%`, `TS%`, `USG%`, and at least one `td` whose inline `style` background is one of the extension's stops (see Step 3).
-  - `mock data is labelled illustrative`: `#see` textContent matches `/illustrative|made up/i`.
-  - `see section shows a mock radar card`: `#see svg.radar` exists with 3 data `polygon` elements tagged `data-window="season"`, `"L10"`, `"L5"`.
-
-- [ ] **Step 2: Run** the site test. Expected: FAIL.
+- [ ] **Step 2: Run** `npx vitest run test/unit/site.test.ts`. Expected: FAIL (cannot resolve `site/version.js`).
 
 - [ ] **Step 3: Implement.**
-  - Table: generic stats table (not a copy of Yahoo's UI), 5 to 6 made-up players (for example J. Marlow, D. Okafor-Reyes, T. Lindqvist), columns Player, MIN, PTS, REB, AST, eFG%, TS%, USG%, wrapped in a container with `overflow-x: auto`. Shading from `src/content/shading.ts`: quality stops `#ef9a9a #f5bf94 #f9e595 #b5d9a2 #7dbb88` for eFG%/TS%, usage stops `#eceffa #d6dbf3 #bfc8ec #a6b1e3 #8d9ada` for USG%, used as exact stop values on cells. One low-minutes row gets the small-sample dot on its USG% cell with a `title` like "Small sample: 2 of 12 team games, 6.0 MPG".
-  - Radar card: dark card styled like the tooltip, nine axes clockwise from 12 o'clock with labels from `src/shared/spiderAxes.ts` (3PM, PTS, REB, AST, STL, BLK, TO, TS%, USG%; write "TO" plus a down arrow as in the source), rings in `rgba(255,255,255,.08)`, polygons coloured per `src/ui/spider-chart.ts`: season `#9CA3AF` fill opacity .18, L10 `#0ABAB5` .22, L5 `#F59E0B` .30, legend Season / L10 / L5.
-  - Caption: players and numbers are illustrative.
+  - `site/leather.svg`: copy of `.superpowers/brainstorm/pebble-tile.svg`; CSS shows it at `0 0/240px 240px` over `#b9521f`, with `box-shadow: inset 0 0 26px rgba(70,22,4,.55)`.
+  - `site/favicon.svg`: copy of `docs/logo-samples/D-bluemoon-gradient.svg`.
+  - `site/version.js`: `formatLatest` plus an `init()` run on load that fetches the API URL (`Accept: application/vnd.github+json`), passes JSON to `formatLatest`, and if non-null sets the `small[data-latest]` text and removes `hidden`; any error leaves it hidden. Loaded with `<script type="module" src="version.js">`. Format the date with `toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })`.
+  - `site/index.html` and `site/styles.css`: port `.superpowers/brainstorm/splash-v9.html` (layout, leather bars with `#1b1310` seams, whiteboard gradient, large sketch on the right that draws in once and stays, faded behind text under 1000px) with these changes: copy per Global Constraints; `.brand` logo replaced by the animated logo from card 1 of `.superpowers/brainstorm/130-1792813655/content/logo-anim.html` (as `svg.logo`, unique gradient id); kicker as a bold `p.kicker` above the `h1`; a small note under the button such as "Free and open source. Installs on desktop Chrome, Edge or Brave."; head tags per the test; use `min-height: 100svh` with fallback `100vh` so it fills phone screens and scrolls vertically when content is taller. Reduced-motion block shows all final frames and hides the logo's play group.
+  - `site/README.md`: what the folder is; Cloudflare Pages settings (connect the GitHub repo, production branch `main`, framework preset None, build command empty, output directory `site`, project name `hoopradar`); local preview (`npx serve site`, since `type="module"` scripts do not run from `file://`); domain move: edit `og:url`, `og:image`, `twitter:image` in `index.html`; regenerating `og.png` (`node scripts/render-og.mjs`) and `leather.svg` (generated tile, edit by hand or replace).
 
 - [ ] **Step 4: Run** the site test. Expected: PASS.
 
-- [ ] **Step 5: Run** the chain, commit `feat(site): mock stats table and radar card`.
+- [ ] **Step 5: Run** `npm run typecheck && npm test && npm run build`. Expected: all pass; `dist/` contains no site files.
 
-### Task 4: Install, Updating, FAQ
+- [ ] **Step 6: Commit** `feat(site): single-screen landing page`.
+
+### Task 2: README additions and mock screenshots
 
 **Files:**
-- Modify: `site/index.html` (`#install`, `#update`, `#faq`), `site/styles.css`
-- Test: `test/unit/site.test.ts`
+- Create: `docs/images/stats-table.svg`, `docs/images/radar-card.svg`
+- Modify: `README.md`
 
 **Interfaces:**
-- Consumes: `loadDoc()`.
+- Consumes: nothing from Task 1 except the site address.
 
-- [ ] **Step 1: Add failing tests.**
-  - `install has four steps and links to releases`: `#install ol > li` count is 4; `#install a[href="https://github.com/ccc1236/hoopradar/releases"]` exists; textContent contains `chrome://extensions`, `Developer mode`, `Load unpacked`, and matches `/stay/i` (folder must stay put).
-  - `update explains unzip over the same folder`: `#update` textContent matches `/same folder/i`, contains `reload`, and matches `/Watch/`.
-  - `faq answers the expected questions`: `#faq details` count is at least 7, and summaries together match `/free/i`, `/data/i`, `/browser/i`, `/match Yahoo/i`, `/slow/i`, `/ESPN/i`, `/Chrome Web Store/i`.
-  - `does not explain the store absence`: whole document text does not match `/\b(headers?|Akamai|bot|spoof\w*)\b/i`.
+- [ ] **Step 1: Make the images.**
+  - `docs/images/stats-table.svg`: generic stats table (not Yahoo's UI), about 6 made-up players (J. Marlow, D. Okafor-Reyes, T. Lindqvist, and similar), columns Player, MIN, PTS, REB, AST, eFG%, TS%, USG%. Cell fills use the exact stops from `src/content/shading.ts` (quality `#ef9a9a #f5bf94 #f9e595 #b5d9a2 #7dbb88`, usage `#eceffa #d6dbf3 #bfc8ec #a6b1e3 #8d9ada`); one low-minutes row with the small dark dot on its USG% cell. Text as SVG text in a system font, no external refs.
+  - `docs/images/radar-card.svg`: dark card like the tooltip, nine axes clockwise from 12 o'clock labelled 3PM, PTS, REB, AST, STL, BLK, TO (with down arrow), TS%, USG% (`src/shared/spiderAxes.ts`), rings `rgba(255,255,255,.08)`, polygons season `#9CA3AF` fill-opacity .18, L10 `#0ABAB5` .22, L5 `#F59E0B` .30 (`src/ui/spider-chart.ts`), legend, made-up player name.
 
-- [ ] **Step 2: Run** the site test. Expected: FAIL.
+- [ ] **Step 2: Edit `README.md`** per the spec's "README changes": link to `https://hoopradar.pages.dev` under the title; both images near the top with an "illustrative, made-up players" caption; "What it does on the page" led by the four headline features; Install adds the developer-mode warning note and "then open your league's Players or My Team page"; Updating adds no auto-update plus "Watch > Custom > Releases"; new "FAQ" section with the seven questions, absorbing overlapping bullets from "Things to know before installing" (keep that section for what is left, or fold it entirely if nothing remains). Facts must match the existing README and `CHANGELOG.md`.
 
-- [ ] **Step 3: Implement** using the spec's "Install in 2 minutes", "Updating" and "FAQ" sections verbatim for facts, in plain language. FAQ as `<details><summary>` items. Install also notes the developer-mode warning Chrome may show and "then open your league's Players or My Team page". Updating suggests "Watch > Custom > Releases" on the GitHub repo.
+- [ ] **Step 3: Verify.** Images open in the browser and look right; README has no U+2013/U+2014 (`rg "[\x{2013}\x{2014}]" README.md docs/images` returns nothing); the three-command chain passes.
 
-- [ ] **Step 4: Run** the site test. Expected: PASS.
+- [ ] **Step 4: Commit** `docs: README screenshots, FAQ and install notes moved from the landing page`.
 
-- [ ] **Step 5: Run** the chain, commit `feat(site): install, updating and FAQ sections`.
-
-### Task 5: Preview image and final checks
+### Task 3: Preview image and final checks
 
 **Files:**
 - Create: `scripts/render-og.mjs`, `site/og.svg`, `site/og.png`
 - Test: `test/unit/site.test.ts`
 
 **Interfaces:**
-- Consumes: the `og:image` URL from Task 1 (`https://hoopradar.pages.dev/og.png`).
+- Consumes: `siteFiles()` from Task 1; `og:image` URL `https://hoopradar.pages.dev/og.png`.
 
-- [ ] **Step 1: Add failing test** `preview image exists at 1200x630`: `site/og.png` exists, and its PNG IHDR width and height (bytes 16 to 23, big-endian) are 1200 and 630.
+- [ ] **Step 1: Add failing test** `preview image is 1200x630`: `site/og.png` exists and its IHDR width/height (bytes 16 to 23, big-endian) are 1200 and 630.
 
-- [ ] **Step 2: Run** the site test. Expected: FAIL, ENOENT.
+- [ ] **Step 2: Run** the site test. Expected: FAIL (ENOENT).
 
-- [ ] **Step 3: Implement.** `site/og.svg`: 1200x630, background `#10151f`, the static logo tile (final frame) on the left, headline and one line on the right in a system sans font, orange accent. `scripts/render-og.mjs`: reads `site/og.svg`, writes `site/og.png` with `sharp(svg, { density: 144 }).resize(1200, 630).png()`; header comment in the style of `scripts/rasterize-icons.mjs`. Run `node scripts/render-og.mjs`.
+- [ ] **Step 3: Implement.** `site/og.svg`: 1200x630, leather strips top and bottom (embed the tile as a `<pattern>` from `leather.svg` contents, since sharp cannot load external files), whiteboard middle, static logo, kicker and headline in the page's colours and a system sans font. `scripts/render-og.mjs`: `sharp(svg, { density: 144 }).resize(1200, 630).png()` to `site/og.png`, header comment in the style of `scripts/rasterize-icons.mjs`. Run it and check the PNG visually.
 
 - [ ] **Step 4: Run** the site test. Expected: PASS.
 
-- [ ] **Step 5: Browser checks** (open `site/index.html` in the browser pane):
-  - At 360x800: `document.documentElement.scrollWidth <= 360`; hero, sections and footer readable; the table scrolls inside its box.
-  - At desktop width: hero side by side, logo animation plays once and ends on the clean logo, whiteboard beside the feature list.
-  - With reduced motion emulated (or by temporarily checking the CSS rule in DevTools): logo and whiteboard show final frames immediately.
-  - The hero button opens the releases page.
-  - Check `og.png` visually.
+- [ ] **Step 5: Browser checks** with `npx serve site` in the browser pane:
+  - 1440x900 and 1366x650: everything visible, logo animation plays once and ends on the clean logo, sketch draws on the right, version line shows "Latest: v0.2.5, released 24 Oct 2026" (or the newer real release).
+  - 360x640: `document.documentElement.scrollWidth <= 360`, text readable over the faded sketch, button reachable.
+  - Failure path: block or break the API URL (DevTools request blocking or a temporary bad URL) and reload: button shows without the version line.
+  - Reduced motion emulated: final frames immediately.
+  - Button opens the releases page.
 
 - [ ] **Step 6: Run** the chain, commit `feat(site): link preview image`.
