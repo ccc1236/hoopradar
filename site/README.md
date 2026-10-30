@@ -15,11 +15,15 @@ Design: `docs/superpowers/specs/2026-10-24-landing-site-design.md`.
 
 Checked by `test/unit/site.test.ts` (part of `npm test`).
 
-## Cloudflare Pages
+## Cloudflare (Workers with static assets)
 
-1. Workers & Pages > Create > Pages > Connect to Git, pick `ccc1236/hoopradar`.
-2. Project name `hoopradar`, production branch `main`, framework preset None, build command empty, build output directory `site`.
-3. After the first deploy: Custom domains > Set up a domain > `hoopradar.app`. Cloudflare adds the DNS record and the HTTPS certificate. `hoopradar.pages.dev` keeps working as a fallback.
+Deployed as a Worker named `hoopradar`, connected to `ccc1236/hoopradar` (production branch `main`):
+
+- Build command: empty
+- Deploy command: `npx wrangler deploy --assets=./site --name=hoopradar --compatibility-date=2026-10-01`
+- Preview command (required by the form, previews are off): `npx wrangler versions upload --assets=./site --name=hoopradar --compatibility-date=2026-10-01`
+
+Custom domain: Worker > Settings > Domains & Routes > Add > Custom domain > `hoopradar.app`. Fallback address: `https://hoopradar.cloudflare-spwf6.workers.dev`.
 
 Every push to `main` redeploys.
 
