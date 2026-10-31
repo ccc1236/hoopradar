@@ -54,10 +54,12 @@ footer.leather {
 }
 
 .sketch {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   position: absolute;
   top: 50%;
-  right: -6%;
-  height: 105%;
+  right: 2%;
+  width: 30vw;
+  height: auto;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -129,24 +131,20 @@ h1 span { color: var(--accent); }
   color: var(--ink-soft);
 }
 
-@media (max-width: 1180px) {
-  .sketch { right: -30%; height: 90%; opacity: .22; }
+@media (max-width: 1280px) {
+  .sketch { right: -15%; width: min(110vw, 90vh); opacity: .18; }
 }
 
-/* Draw-in animation shared by the logo and the whiteboard sketch. */
+/* Draw-in animation for the whiteboard sketch. */
 .d { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw var(--t, .4s) cubic-bezier(.6, .05, .3, 1) var(--d, 0s) forwards; }
 .pop { opacity: 0; transform-box: fill-box; transform-origin: center; animation: pop .35s cubic-bezier(.2, 1.6, .4, 1) var(--d, 0s) forwards; }
 .fade { opacity: 0; animation: fade .25s ease var(--d, 0s) forwards; }
-.tile { opacity: 0; animation: fade .3s ease forwards; }
-.play { animation: playout .5s ease var(--out, 4.6s) forwards; }
 
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes pop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
 @keyframes fade { to { opacity: 1; } }
-@keyframes playout { to { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .d { stroke-dashoffset: 0; animation: none; }
-  .pop, .fade, .tile { opacity: 1; transform: none; animation: none; }
-  .logo .play { display: none; }
+  .pop, .fade { opacity: 1; transform: none; animation: none; }
 }

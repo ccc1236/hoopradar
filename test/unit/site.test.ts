@@ -107,4 +107,10 @@ describe("landing page", () => {
     expect(logo?.querySelector('circle[cx="64"][cy="96"][r="7"]')).not.toBeNull();
     expect(logo?.querySelector('line[x1="48"][y1="108"][x2="80"][y2="108"]')).not.toBeNull();
   });
+
+  it("preview image is 1200x630", () => {
+    const png = readFileSync(join(SITE, "og.png"));
+    expect(png.readUInt32BE(16)).toBe(1200);
+    expect(png.readUInt32BE(20)).toBe(630);
+  });
 });
