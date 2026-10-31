@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/ccc1236/hoopradar/releases/latest"><img src="https://img.shields.io/github/v/release/ccc1236/hoopradar?label=latest&color=ff8a3d" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/status-beta-e0552b" alt="Status: beta">
   <img src="https://img.shields.io/badge/Chrome%20%7C%20Edge%20%7C%20Brave-desktop-2D4A5B" alt="Chrome, Edge, Brave (desktop)">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22313d" alt="MIT licence"></a>
 </p>
@@ -19,6 +20,8 @@
 # HoopRadar
 
 A free Chrome extension that puts advanced stats on Yahoo Fantasy Basketball's **Players** and **My Team** pages: eFG%, TS% and USG% columns, Last 5 / Last 10 game windows, and Per 36 / Per 100 possession modes. Data comes from nba.com/stats.
+
+> HoopRadar is in beta: expect rough edges, and please [report issues](https://github.com/ccc1236/hoopradar/issues).
 
 <p align="center">
   <img src="docs/images/stats-table.svg" alt="Mock stats table with shaded eFG%, TS% and USG% columns" width="64%">
