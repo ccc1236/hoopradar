@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="380" viewBox="0 0 420 380" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect width="420" height="380" rx="12" fill="#1F3645"/>
+<text x="20" y="34" font-size="16" font-weight="700" fill="#FFFFFF">J. Marlow</text><text x="20" y="54" font-size="12" fill="#9CA3AF">SF · Per Game · percentile vs league</text>
+<polygon fill="none" stroke="rgba(255,255,255,.08)" points="210.0,178.5 229.0,185.4 239.1,202.9 235.5,222.8 220.1,235.7 199.9,235.7 184.5,222.8 180.9,202.9 191.0,185.4"/>
+<polygon fill="none" stroke="rgba(255,255,255,.08)" points="210.0,149.0 247.9,162.8 268.1,197.8 261.1,237.5 230.2,263.4 189.8,263.4 158.9,237.5 151.9,197.8 172.1,162.8"/>
+<polygon fill="none" stroke="rgba(255,255,255,.08)" points="210.0,119.5 266.9,140.2 297.2,192.6 286.6,252.2 240.3,291.2 179.7,291.2 133.4,252.3 122.8,192.6 153.1,140.2"/>
+<polygon fill="none" stroke="rgba(255,255,255,.18)" points="210.0,90.0 285.8,117.6 326.2,187.5 312.2,267.0 250.4,318.9 169.6,318.9 107.8,267.0 93.8,187.5 134.2,117.6"/>
+<line x1="210.0" y1="208.0" x2="210.0" y2="90.0" stroke="rgba(255,255,255,.08)"/>
+<text x="210.0" y="72.8" font-size="12" fill="#9CA3AF" text-anchor="middle">3PM</text>
+<line x1="210.0" y1="208.0" x2="285.8" y2="117.6" stroke="rgba(255,255,255,.08)"/>
+<text x="299.5" y="105.3" font-size="12" fill="#9CA3AF" text-anchor="middle">PTS</text>
+<line x1="210.0" y1="208.0" x2="326.2" y2="187.5" stroke="rgba(255,255,255,.08)"/>
+<text x="347.1" y="187.8" font-size="12" fill="#9CA3AF" text-anchor="middle">REB</text>
+<line x1="210.0" y1="208.0" x2="312.2" y2="267.0" stroke="rgba(255,255,255,.08)"/>
+<text x="330.6" y="281.6" font-size="12" fill="#9CA3AF" text-anchor="middle">AST</text>
+<line x1="210.0" y1="208.0" x2="250.4" y2="318.9" stroke="rgba(255,255,255,.08)"/>
+<text x="257.6" y="342.8" font-size="12" fill="#9CA3AF" text-anchor="middle">STL</text>
+<line x1="210.0" y1="208.0" x2="169.6" y2="318.9" stroke="rgba(255,255,255,.08)"/>
+<text x="162.4" y="342.8" font-size="12" fill="#9CA3AF" text-anchor="middle">BLK</text>
+<line x1="210.0" y1="208.0" x2="107.8" y2="267.0" stroke="rgba(255,255,255,.08)"/>
+<text x="89.4" y="281.6" font-size="12" fill="#9CA3AF" text-anchor="middle">TO↓</text>
+<line x1="210.0" y1="208.0" x2="93.8" y2="187.5" stroke="rgba(255,255,255,.08)"/>
+<text x="72.9" y="187.8" font-size="12" fill="#9CA3AF" text-anchor="middle">TS%</text>
+<line x1="210.0" y1="208.0" x2="134.2" y2="117.6" stroke="rgba(255,255,255,.08)"/>
+<text x="120.5" y="105.3" font-size="12" fill="#9CA3AF" text-anchor="middle">USG%</text>
+<polygon data-window="season" points="210.0,134.8 269.2,137.5 262.3,198.8 281.5,249.3 232.2,269.0 197.9,241.3 160.9,236.3 126.3,193.2 149.3,135.7" fill="#9CA3AF" fill-opacity="0.18" stroke="#9CA3AF" stroke-opacity="0.55" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon data-window="L10" points="210.0,125.4 273.7,132.1 268.1,197.8 277.4,246.9 234.2,274.5 195.9,246.8 156.9,238.7 119.4,192.0 146.3,132.1" fill="#0ABAB5" fill-opacity="0.22" stroke="#0ABAB5" stroke-opacity="0.7" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon data-window="L5" points="210.0,111.2 279.0,125.7 258.8,199.4 285.6,251.7 237.4,283.4 198.7,239.0 148.7,243.4 107.7,190.0 143.3,128.5" fill="#F59E0B" fill-opacity="0.3" stroke="#F59E0B" stroke-opacity="0.9" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="100.0" y="350" width="12" height="12" rx="2" fill="#9CA3AF"/><text x="118.0" y="360" font-size="12" fill="#E5E7EB">Season</text>
+<rect x="180.0" y="350" width="12" height="12" rx="2" fill="#0ABAB5"/><text x="198.0" y="360" font-size="12" fill="#E5E7EB">L10</text>
+<rect x="260.0" y="350" width="12" height="12" rx="2" fill="#F59E0B"/><text x="278.0" y="360" font-size="12" fill="#E5E7EB">L5</text>
+</svg>

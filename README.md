@@ -1,41 +1,110 @@
+<p align="center">
+  <a href="https://hoopradar.app"><img src="site/og.png" alt="HoopRadar: Your league sees points. You see who's under the radar." width="100%"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/ccc1236/hoopradar/releases/latest"><img src="https://img.shields.io/github/v/release/ccc1236/hoopradar?label=latest&color=ff8a3d" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/Chrome%20%7C%20Edge%20%7C%20Brave-desktop-2D4A5B" alt="Chrome, Edge, Brave (desktop)">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22313d" alt="MIT licence"></a>
+</p>
+
+<p align="center">
+  <b><a href="https://github.com/ccc1236/hoopradar/releases/latest">Download</a></b> &nbsp;·&nbsp;
+  <a href="https://hoopradar.app">Website</a> &nbsp;·&nbsp;
+  <a href="#install">Install</a> &nbsp;·&nbsp;
+  <a href="#faq">FAQ</a> &nbsp;·&nbsp;
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
+
 # HoopRadar
 
-Yahoo Fantasy NBA advanced-stats overlay (Chromium MV3 extension).
+A free Chrome extension that puts advanced stats on Yahoo Fantasy Basketball's **Players** and **My Team** pages: eFG%, TS% and USG% columns, Last 5 / Last 10 game windows, and Per 36 / Per 100 possession modes. Data comes from nba.com/stats.
 
-Adds three advanced columns (eFG%, TS%, USG%), game-based time windows (Last 5 / Last 10 played), and per-mode toggles (Per Game / Per 36 / Per 100 possessions) on top of Yahoo Fantasy NBA pages. Data is fetched from nba.com/stats.
+<p align="center">
+  <img src="docs/images/stats-table.svg" alt="Mock stats table with shaded eFG%, TS% and USG% columns" width="64%">
+  <img src="docs/images/radar-card.svg" alt="Mock radar card comparing Season, L10 and L5" width="34%">
+</p>
+<p align="center"><sub>Illustrative mock-ups: made-up players and numbers.</sub></p>
 
-## What it does on the page
+## What it does
 
-On the **Players** and **My Team** pages, HoopRadar:
+- **Advanced columns, colour shaded.** eFG%, TS% and USG% appear under an "Advanced" header. eFG% and TS% are shaded from red (poor) through yellow (league average) to green (elite); USG% uses a blue scale, because high usage is a role, not good or bad. Small samples get a dot on the USG% cell.
+- **Last 5 / Last 10 games.** Windows count games the player actually played, unlike Yahoo's day-based filter.
+- **Per Game, Per 36, Per 100 possessions.** Counting stats (PTS, REB, AST, ST, BLK, 3PTM, TO) rescale; ratios like FG% and TS% stay the same, as they should.
+- **Radar card.** Hover a player to compare their Season, L10 and L5 percentiles across nine stats; click to pin it, then click an axis for the stat's rank and league average.
 
-- Mounts a small filter bar above the stats table with Window, Per Mode, Refresh, and a status line
-- Appends three new columns (eFG%, TS%, USG%) under an "Advanced" group header
-- Overrides Yahoo's existing stat cells (PTS, REB, AST, ST, BLK, 3PTM, FG%, FT%, TO) with values matching the selected HoopRadar window and per mode
-- Re-applies your active sort after each update so row order stays consistent
-
-The overlay replaces the values Yahoo displays; the page's HTML structure, sorting, and pagination are otherwise untouched.
-
-## Things to know before installing
-
-- **HoopRadar overrides Yahoo's displayed numbers** with values computed from nba.com. Yahoo's own "Stats" dropdown (Season / Last 7 / Last 14 / Last 30 days) still works, but its picks are immediately replaced by HoopRadar's overrides after the page reloads. The two time concepts are different: Yahoo's filter is days, HoopRadar's is games the player actually appeared in.
-- **L5 / L10 are player-scoped, not team-scoped.** A player who sat out the last three games and played in five before that gets L5 from those five appearances, not from his team's last five team games.
-- **Ratio stats are scale-invariant across Per Mode.** eFG%, TS%, USG%, FG%, FT%, and 3P% are all ratios or per-possession rates. They do not change between Per Game / Per 36 / Per 100. The Window (Season / L5 / L10) does change them because the game sample changes.
-- **First use pulls fresh data, so it takes a few seconds.** HoopRadar caches nba.com stats for about 6 hours. Each Window (Season / L5 / L10) and Per Mode (Per Game / Per 36 / Per 100) is cached separately, so the first time you pick a new combination it refetches, and opening a player's spider chart loads all three windows at once. While that happens you will see a pulsing "Loading..." or "Refreshing..." status. Requests are deliberately spaced out to stay friendly with nba.com, which is why a cold fetch is not instant. Subsequent views inside the cache window are immediate.
-- **nba.com is occasionally flaky.** It sometimes returns a brief error on a cold request and then serves it fine moments later. HoopRadar retries automatically; if a stat still fails to load, clicking Refresh usually clears it.
-- The extension only fires on Yahoo Fantasy Basketball Players and My Team pages. It does not send data anywhere outside of stats.nba.com requests for stat data.
+A small filter bar above the table holds Window, Per Mode, Refresh and a status line. HoopRadar replaces the stat values Yahoo displays with nba.com numbers for your chosen window and mode, then re-applies your sort; the page's structure, sorting and pagination are otherwise untouched.
 
 ## Install
 
-1. Download the latest `hoopradar-vX.Y.Z.zip` from the [releases page](https://github.com/ccc1236/hoopradar/releases)
-2. Unzip it somewhere permanent. Chrome loads an unpacked extension from that folder every time it starts, so the folder has to stay put. Unzipping into Downloads and tidying up later will break the extension.
-3. In Chrome go to `chrome://extensions` and enable Developer mode
-4. Click "Load unpacked" and select the unzipped `hoopradar` folder
+HoopRadar is not on the Chrome Web Store yet, so it installs as an unpacked extension. It takes about two minutes.
 
-### Updating
+1. Download the latest `hoopradar-vX.Y.Z.zip` from the [releases page](https://github.com/ccc1236/hoopradar/releases).
+2. Unzip it somewhere permanent. Chrome loads the extension from that folder every time it starts, so it has to stay put: unzipping into Downloads and tidying up later will break it.
+3. Go to `chrome://extensions` and turn on **Developer mode** (top right).
+4. Click **Load unpacked** and select the unzipped `hoopradar` folder.
 
-Unzip the new version over the same folder, then click the reload arrow on the HoopRadar card in `chrome://extensions`.
+Then open your league's Players or My Team page. Chrome may show a warning about developer-mode extensions; that is expected for extensions installed this way.
 
-Keep the same path. Chrome derives an unpacked extension's identity from its folder path, so loading a new copy from a different location installs a second extension alongside the first and starts it with empty storage, losing your settings and cached player mapping. Every release ships with the same inner folder name (`hoopradar`) so that unzipping over the previous one is the natural thing to do.
+Works in Chrome, Edge and Brave on desktop (use `edge://extensions` or `brave://extensions`).
+
+## Updating
+
+There is no auto-update. To hear about new versions, click **Watch > Custom > Releases** at the top of this repo.
+
+To update, unzip the new version over the same folder, then click the reload arrow on the HoopRadar card in `chrome://extensions`.
+
+Keep the same folder. Chrome identifies an unpacked extension by its folder path, so loading a copy from a different place installs a second HoopRadar alongside the first, starting with empty storage (your settings and cached player mapping are lost). Every release unzips to a folder named `hoopradar` so that unzipping over the old one is the natural thing to do.
+
+## FAQ
+
+<details>
+<summary><b>Is it free?</b></summary>
+
+Yes. Free and open source under the MIT licence.
+</details>
+
+<details>
+<summary><b>Does it collect my data?</b></summary>
+
+No. It only requests stats from stats.nba.com. Nothing about you or your league leaves your browser, and there is no analytics or tracking.
+</details>
+
+<details>
+<summary><b>Which browsers does it work in?</b></summary>
+
+Chromium browsers on desktop: Chrome, Edge and Brave. Not Firefox, Safari or mobile.
+</details>
+
+<details>
+<summary><b>Why don't the numbers match Yahoo's?</b></summary>
+
+HoopRadar replaces Yahoo's displayed stats with nba.com numbers for the window and mode you pick. Yahoo's own Stats dropdown (Last 7 / 14 / 30 days) still works, but its picks are replaced after the page reloads. The two time concepts differ: Yahoo's filter is days, HoopRadar's is games the player actually appeared in. L5 and L10 are per player: someone who sat out three games gets L5 from their last five appearances.
+</details>
+
+<details>
+<summary><b>Why don't eFG%, TS% and USG% change when I switch Per Mode?</b></summary>
+
+They are ratios or per-possession rates, so Per Game, Per 36 and Per 100 give the same values (the same goes for FG%, FT% and 3P%). The Window does change them, because the game sample changes.
+</details>
+
+<details>
+<summary><b>Why is the first load slow?</b></summary>
+
+The first time you pick a Window and Per Mode combination, HoopRadar fetches fresh data from nba.com, which takes a few seconds; requests are deliberately spaced out to stay friendly with nba.com. Data is then cached for about 6 hours, so later views are instant. Opening a player's radar card loads all three windows at once. nba.com is occasionally flaky; HoopRadar retries automatically, and clicking Refresh usually clears a stat that still failed.
+</details>
+
+<details>
+<summary><b>Does it work on ESPN, Sleeper or other sites?</b></summary>
+
+No. Yahoo Fantasy Basketball only, on the Players and My Team pages.
+</details>
+
+<details>
+<summary><b>Is it on the Chrome Web Store?</b></summary>
+
+Not yet. Install from GitHub as described above.
+</details>
 
 ## Development
 
@@ -46,8 +115,8 @@ npm run typecheck
 npm run build         # writes dist/
 ```
 
-After a code change: `npm run build`, then reload the extension in `chrome://extensions` and hard-refresh any Yahoo tab where you want to see the new build.
+After a code change: `npm run build`, then reload the extension in `chrome://extensions` and hard-refresh any Yahoo tab where you want to see the new build. The landing page lives in [`site/`](site/README.md).
 
 ## License
 
-MIT.
+MIT. HoopRadar is an independent project, not affiliated with Yahoo or the NBA.
