@@ -100,6 +100,54 @@ describe("ownWindowsStore", () => {
     expect(await store.getRows("2026-27", 5, "PerGame")).toEqual({ rows: [], staleSince: null });
   });
 
+  it("stops at once when nba.com refuses Base, without asking for Advanced", async () => {
+    const { store, fetchLogs } = setup();
+    fetchLogs.mockImplementation(async (_s, m) => {
+      if (m === "Base") throw new RateLimitedError();
+      return ADV;
+    });
+    await expect(store.getRows("2026-27", 5, "PerGame")).rejects.toBeInstanceOf(RateLimitedError);
+    expect(fetchLogs.mock.calls.map((c) => c[1])).toEqual(["Base"]);
+  });
+
+  it("does not retry a failed download for 5 minutes, using saved rows meanwhile", async () => {
+    const { store, fetchLogs, advance } = setup();
+    await store.getRows("2026-27", 5, "PerGame");
+    advance(7 * HOUR);
+    fetchLogs.mockClear();
+    fetchLogs.mockRejectedValue(new UpstreamUnavailableError(503));
+    await store.getRows("2026-27", 10, "PerGame");
+    const second = await store.getRows("2026-27", 5, "PerGame");
+    expect(fetchLogs).toHaveBeenCalledTimes(1);
+    expect(second.staleSince).toBe(T0);
+    advance(5 * 60 * 1000 + 1);
+    await store.getRows("2026-27", 5, "PerGame");
+    expect(fetchLogs).toHaveBeenCalledTimes(2);
+  });
+
+  it("repeats the error without retrying for 5 minutes when nothing is saved", async () => {
+    const { store, fetchLogs } = setup();
+    fetchLogs.mockRejectedValue(new UpstreamUnavailableError(503));
+    await expect(store.getRows("2026-27", 10, "PerGame")).rejects.toBeInstanceOf(UpstreamUnavailableError);
+    await expect(store.getRows("2026-27", 5, "PerGame")).rejects.toBeInstanceOf(UpstreamUnavailableError);
+    expect(fetchLogs).toHaveBeenCalledTimes(1);
+  });
+
+  it("lets Refresh try again straight after a failure", async () => {
+    const { store, fetchLogs } = setup();
+    fetchLogs.mockRejectedValueOnce(new UpstreamUnavailableError(503));
+    await expect(store.getRows("2026-27", 5, "PerGame")).rejects.toBeInstanceOf(UpstreamUnavailableError);
+    expect((await store.getRows("2026-27", 5, "PerGame", true)).staleSince).toBeNull();
+  });
+
+  it("marks saved rows as stale when a later download comes back empty", async () => {
+    const { store, fetchLogs, advance } = setup();
+    await store.getRows("2026-27", 5, "PerGame");
+    advance(7 * HOUR);
+    fetchLogs.mockResolvedValue([]);
+    expect((await store.getRows("2026-27", 5, "PerGame")).staleSince).toBe(T0);
+  });
+
   it("does not repeat an empty download within the hour, then checks again", async () => {
     const { store, fetchLogs, advance } = setup({ base: [], adv: [] });
     await store.getRows("2026-27", 5, "PerGame");

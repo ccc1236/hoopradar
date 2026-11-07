@@ -67,6 +67,46 @@ describe("players page module", () => {
     expect(group!.colSpan).toBe(3);
   });
 
+  it("ignores a slow response after the user has moved to another window", async () => {
+    let releaseL5: (v: unknown) => void = () => {};
+    const stats = (id: string, efg: number) => ({ nbaId: Number(id), name: "P", teamAbbr: "DEN", position: null, stats: { EFG_PCT: efg } });
+    const respond = (ids: string[], efg: number) => ({
+      type: "getPlayerStatsResponse",
+      byYahooId: Object.fromEntries(ids.map((id) => [id, stats(id, efg)])),
+      fetchedAt: 0,
+      staleSince: null,
+      shading: { baseline: {}, sampleByYahooId: {} },
+    });
+    const sendMessage = vi.fn(async (msg: { type: string; window?: string; yahooIds?: string[] }) => {
+      if (msg.type === "getPlayerStats") {
+        const ids = msg.yahooIds ?? [];
+        if (msg.window === "Last5") {
+          await new Promise((res) => (releaseL5 = res));
+          return respond(ids, 0.111);
+        }
+        return respond(ids, 0.555);
+      }
+      return { type: "bootstrapPlayersResponse", added: 0, unmapped: [] };
+    });
+    (chrome as unknown as { runtime: { sendMessage: unknown } }).runtime = { sendMessage };
+
+    await run({ kind: "players", leagueId: "123456" });
+    const bar = document.querySelector(".hoopradar-bar-host")!;
+    const change = (window: string) =>
+      bar.dispatchEvent(new CustomEvent("hoopradar-filter-change", { detail: { window, perMode: "PerGame" } }));
+    const flush = () => new Promise((res) => setTimeout(res, 0));
+    const cell = () => document.querySelector('td[data-hoopradar="EFG_PCT"]')!.textContent;
+
+    change("Last5");
+    await flush();
+    change("Season");
+    await flush();
+    expect(cell()).toBe(".555");
+    releaseL5(null);
+    await flush();
+    expect(cell()).toBe(".555");
+  });
+
   it("populates adv cells in player rows", async () => {
     await run({ kind: "players", leagueId: "123456" });
     const advCells = document.querySelectorAll("td[data-hoopradar]");

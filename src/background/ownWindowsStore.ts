@@ -9,6 +9,8 @@ import { buildLastPlayed, buildOwnWindowRows, joinGameLogs } from "./ownWindows.
 const FRESH_MS = 6 * 60 * 60 * 1000;
 /** Before the season starts the logs are empty; recheck hourly so opening night is picked up. */
 const EMPTY_FRESH_MS = 60 * 60 * 1000;
+/** After a failed download, don't try again for this long: a hover or filter change must not hammer nba.com. */
+const RETRY_AFTER_MS = 5 * 60 * 1000;
 /** Saved rows have no age limit, and the cache deletes on expiry, so freshness is judged here. */
 const KEEP_MS = 10 * 365 * 24 * 60 * 60 * 1000;
 
@@ -52,14 +54,18 @@ const isEmpty = (s: Saved): boolean => Object.keys(s.rows).length === 0;
 export function createOwnWindowsStore(deps: OwnWindowsStoreDeps): OwnWindowsStore {
   const now = deps.now ?? Date.now;
   const inFlight = new Map<string, Promise<Saved>>();
+  const lastFailure = new Map<string, { at: number; error: unknown }>();
   const keyFor = (season: string): string => `own:v1:${season}`;
 
   async function download(season: string, saved: Saved | null): Promise<Saved> {
-    const [base, adv] = await Promise.all([deps.fetchLogs(season, "Base"), deps.fetchLogs(season, "Advanced")]);
+    // One after the other: if nba.com refuses Base, Advanced must never go out.
+    const base = await deps.fetchLogs(season, "Base");
+    const adv = await deps.fetchLogs(season, "Advanced");
     // One measure with rows and not the other is a broken response, not an empty season.
     if ((base.length === 0) !== (adv.length === 0)) throw new UpstreamUnavailableError(200);
     if (base.length === 0) {
-      if (saved && !isEmpty(saved)) return saved;
+      // Mid-season an empty answer is a bad response, so saved rows must read as stale.
+      if (saved && !isEmpty(saved)) throw new UpstreamUnavailableError(200);
       const empty: Saved = { fetchedAt: now(), rows: {}, lastPlayed: {} };
       await deps.cache.set(keyFor(season), empty, KEEP_MS);
       return empty;
@@ -91,13 +97,20 @@ export function createOwnWindowsStore(deps: OwnWindowsStoreDeps): OwnWindowsStor
       if (saved && !forceFresh && now() - saved.fetchedAt <= lifetime) {
         return { rows: saved.rows[slot(n, perMode)] ?? [], staleSince: null };
       }
-      try {
-        const fresh = await shared(season, saved);
-        return { rows: fresh.rows[slot(n, perMode)] ?? [], staleSince: null };
-      } catch (e) {
-        if (e instanceof RateLimitedError) deps.onBlocked();
+      const fallBack = (e: unknown): OwnWindowsResult => {
         if (saved && !isEmpty(saved)) return { rows: saved.rows[slot(n, perMode)] ?? [], staleSince: saved.fetchedAt };
         throw e;
+      };
+      const failed = lastFailure.get(season);
+      if (failed && !forceFresh && now() - failed.at <= RETRY_AFTER_MS) return fallBack(failed.error);
+      try {
+        const fresh = await shared(season, saved);
+        lastFailure.delete(season);
+        return { rows: fresh.rows[slot(n, perMode)] ?? [], staleSince: null };
+      } catch (e) {
+        lastFailure.set(season, { at: now(), error: e });
+        if (e instanceof RateLimitedError) deps.onBlocked();
+        return fallBack(e);
       }
     },
 

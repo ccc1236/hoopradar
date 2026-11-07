@@ -207,7 +207,11 @@ function reSortBy(table: HTMLTableElement, sort: SortInfo): void {
   for (const r of rows) tbody.appendChild(r);
 }
 
+/** Bumped by every load, so a slow response can't overwrite a newer one (L5/L10 can take many seconds). */
+let latestLoad = 0;
+
 async function paint(table: HTMLTableElement, bar: FilterBarHandle, settings: FilterSettings): Promise<void> {
+  const load = ++latestLoad;
   bar.setStatus(loadingText(settings.window));
   const players = scrapePlayers();
   if (players.length === 0) {
@@ -230,6 +234,7 @@ async function paint(table: HTMLTableElement, bar: FilterBarHandle, settings: Fi
     perMode: settings.perMode,
   };
   const resp = await send<GetPlayerStatsResponse | ErrorResponse>(statsReq);
+  if (load !== latestLoad) return;
   if (resp.type === "error") {
     bar.setStatus(`${resp.code}`, "error");
     return;
@@ -289,6 +294,7 @@ export async function run(_info: PageInfo): Promise<{ teardown: () => void }> {
     //      so players whose ROSTERSTATUS changed since the original fetch
     //      (newly activated, returning from injury, etc.) get a fresh chance
     //      at being mapped.
+    const load = ++latestLoad;
     bar.setStatus("Refreshing...");
     const sortInfo = detectActiveSort(table);
     const players = scrapePlayers();
@@ -307,6 +313,7 @@ export async function run(_info: PageInfo): Promise<{ teardown: () => void }> {
       perMode: settings.perMode,
       forceFresh: true,
     });
+    if (load !== latestLoad) return;
     if (r.type === "error") {
       bar.setStatus(`${r.code}`, "error");
       return;
