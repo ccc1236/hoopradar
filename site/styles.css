@@ -91,6 +91,14 @@ footer.leather {
   font-size: 22px;
 }
 .logo { width: 80px; height: 80px; flex: none; }
+.beta {
+  padding: 2px 8px;
+  border: 1.5px solid var(--accent-edge);
+  border-radius: 999px;
+  color: var(--accent-edge);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
 
 .kicker {
   margin: 20px 0 6px;

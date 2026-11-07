@@ -372,7 +372,7 @@ describe("renderColumns shading", () => {
     renderColumns(t, SAMPLE, ALL_SHADED);
     const usg = cell(t, "6014", "USG_PCT");
     expect(usg.querySelectorAll("[data-hoopradar-dot]")).toHaveLength(1);
-    expect(usg.title).toBe("Small sample: 2 of 12 team games, 6.0 MPG");
+    expect(usg.title).toBe("Small sample: 2 games, 6.0 MPG");
     for (const key of ["EFG_PCT", "TS_PCT"]) {
       expect(cell(t, "6014", key).querySelector("[data-hoopradar-dot]")).toBeNull();
       expect(cell(t, "6014", key).title).toBe("");

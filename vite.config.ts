@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { crx } from "@crxjs/vite-plugin";
+import { configDefaults } from "vitest/config";
 import manifest from "./manifest.json" with { type: "json" };
 
 export default defineConfig({
@@ -9,6 +10,8 @@ export default defineConfig({
     globals: true,
     environment: "node",
     setupFiles: ["./test/setup.ts"],
+    // Session worktrees live under .claude/ and carry their own copy of the tests.
+    exclude: [...configDefaults.exclude, ".claude/**"],
     environmentMatchGlobs: [
       ["test/unit/yahooScrape.test.ts", "jsdom"],
       ["test/unit/pages.*.test.ts", "jsdom"],

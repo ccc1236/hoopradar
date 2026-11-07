@@ -37,5 +37,5 @@ export function colorFor(
 }
 
 export function sampleTitle(info: SampleInfo): string {
-  return `Small sample: ${info.gp} of ${info.teamGames} team games, ${info.mpg.toFixed(1)} MPG`;
+  return `Small sample: ${info.gp} game${info.gp === 1 ? "" : "s"}, ${info.mpg.toFixed(1)} MPG`;
 }

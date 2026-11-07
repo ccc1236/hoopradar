@@ -20,6 +20,12 @@ function siteFiles(dir = SITE): string[] {
 
 const css = (): string => readFileSync(join(SITE, "styles.css"), "utf8");
 
+describe("beta label", () => {
+  it("marks the brand as beta", () => {
+    expect(loadDoc().querySelector(".brand .beta")?.textContent).toBe("BETA");
+  });
+});
+
 describe("formatLatest", () => {
   it("formats a release", () => {
     expect(formatLatest({ tag_name: "v0.2.5", published_at: "2026-10-24T09:00:00Z" })).toBe(

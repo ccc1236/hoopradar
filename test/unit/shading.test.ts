@@ -40,7 +40,11 @@ describe("colorFor", () => {
 });
 
 describe("sampleTitle", () => {
+  it("says game rather than games for one", () => {
+    expect(sampleTitle({ small: true, gp: 1, teamGames: 5, mpg: 12 })).toBe("Small sample: 1 game, 12.0 MPG");
+  });
+
   it("formats the hover text", () => {
-    expect(sampleTitle({ small: true, gp: 2, teamGames: 12, mpg: 6 })).toBe("Small sample: 2 of 12 team games, 6.0 MPG");
+    expect(sampleTitle({ small: true, gp: 2, teamGames: 12, mpg: 6 })).toBe("Small sample: 2 games, 6.0 MPG");
   });
 });
