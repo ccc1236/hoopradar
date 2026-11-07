@@ -5,7 +5,7 @@ import type { GetSpiderDataRequest, GetSpiderDataResponse } from "./spider.js";
 import type { ShadingPayload } from "./shading.js";
 
 export const WINDOW_KEYS: readonly WindowKey[] = ["Season", "Last5", "Last10"];
-export const PER_MODE_KEYS: readonly PerModeKey[] = ["PerGame", "Per36", "Per100Possessions"];
+export const PER_MODE_KEYS: readonly PerModeKey[] = ["PerGame", "Per36"];
 
 export interface GetPlayerStatsRequest {
   type: "getPlayerStats";

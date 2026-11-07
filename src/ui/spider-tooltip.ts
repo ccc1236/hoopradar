@@ -196,9 +196,7 @@ export function createSpiderTooltipController(deps: SpiderTooltipDeps): SpiderTo
   }
 
   function perModeLabel(p: PerModeKey): string {
-    if (p === "PerGame") return "Per Game";
-    if (p === "Per36") return "Per 36";
-    return "Per 100";
+    return p === "PerGame" ? "Per Game" : "Per 36";
   }
 
   function windowSlot(w: WindowKey): keyof SpiderData["windows"] {

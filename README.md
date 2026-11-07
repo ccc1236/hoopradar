@@ -19,7 +19,7 @@
 
 # HoopRadar
 
-A free Chrome extension that puts advanced stats on Yahoo Fantasy Basketball's **Players** and **My Team** pages: eFG%, TS% and USG% columns, Last 5 / Last 10 game windows, and Per 36 / Per 100 possession modes. Data comes from nba.com/stats.
+A free Chrome extension that puts advanced stats on Yahoo Fantasy Basketball's **Players** and **My Team** pages: eFG%, TS% and USG% columns, Last 5 / Last 10 game windows, and a Per 36 mode. Data comes from nba.com/stats.
 
 > HoopRadar is in beta: expect rough edges, and please [report issues](https://github.com/ccc1236/hoopradar/issues).
 
@@ -33,7 +33,7 @@ A free Chrome extension that puts advanced stats on Yahoo Fantasy Basketball's *
 
 - **Advanced columns, colour shaded.** eFG%, TS% and USG% appear under an "Advanced" header. eFG% and TS% are shaded from red (poor) through yellow (league average) to green (elite); USG% uses a blue scale, because high usage is a role, not good or bad. Small samples get a dot on the USG% cell.
 - **Last 5 / Last 10 games.** Windows count games the player actually played, unlike Yahoo's day-based filter.
-- **Per Game, Per 36, Per 100 possessions.** Counting stats (PTS, REB, AST, ST, BLK, 3PTM, TO) rescale; ratios like FG% and TS% stay the same, as they should.
+- **Per Game and Per 36.** Counting stats (PTS, REB, AST, ST, BLK, 3PTM, TO) rescale; ratios like FG% and TS% stay the same, as they should.
 - **Radar card.** Hover a player to compare their Season, L10 and L5 percentiles across nine stats; click to pin it, then click an axis for the stat's rank and league average.
 
 A small filter bar above the table holds Window, Per Mode, Refresh and a status line. HoopRadar replaces the stat values Yahoo displays with nba.com numbers for your chosen window and mode, then re-applies your sort; the page's structure, sorting and pagination are otherwise untouched.
@@ -88,7 +88,7 @@ HoopRadar replaces Yahoo's displayed stats with nba.com numbers for the window a
 <details>
 <summary><b>Why don't eFG%, TS% and USG% change when I switch Per Mode?</b></summary>
 
-They are ratios or per-possession rates, so Per Game, Per 36 and Per 100 give the same values (the same goes for FG%, FT% and 3P%). The Window does change them, because the game sample changes.
+They are ratios or per-possession rates, so Per Game and Per 36 give the same values (the same goes for FG%, FT% and 3P%). The Window does change them, because the game sample changes.
 </details>
 
 <details>

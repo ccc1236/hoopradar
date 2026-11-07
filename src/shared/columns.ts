@@ -70,7 +70,7 @@ export const DERIVED_OVERRIDE_COLUMNS: DerivedColumnDef[] = [
   // FG% and FT% derived from rounded made/attempted so the displayed ratio
   // matches FGM/A and FTM/FTA cells visually. nba.com's raw FG_PCT/FT_PCT
   // are computed from un-rounded season totals and drift slightly when the
-  // displayed counting stats are rounded to 1 decimal at Per-36/Per-100
+  // displayed counting stats are rounded to 1 decimal at Per-36
   // scaling. Visual consistency > 0.001-precision in the percentage.
   { numeratorKey: "FGM", denominatorKey: "FGA", source: "Base", decimals: 3, yahooHeader: "FG%" },
   { numeratorKey: "FTM", denominatorKey: "FTA", source: "Base", decimals: 3, yahooHeader: "FT%" },

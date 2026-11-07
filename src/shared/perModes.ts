@@ -10,7 +10,6 @@ export interface PerModeDef {
 export const PER_MODES: PerModeDef[] = [
   { key: "PerGame", label: "Per Game", apiValue: "PerGame" },
   { key: "Per36", label: "Per 36", apiValue: "Per36" },
-  { key: "Per100Possessions", label: "Per 100", apiValue: "Per100Possessions" },
 ];
 
 export function perModeByKey(key: PerModeKey): PerModeDef {

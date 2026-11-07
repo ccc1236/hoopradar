@@ -4,7 +4,7 @@ Project conventions and technical context for AI coding agents working in this r
 
 ## What this is
 
-HoopRadar is a Chromium MV3 extension that overlays advanced metrics (eFG%, TS%, USG%) from nba.com/stats onto Yahoo Fantasy Basketball pages, plus adds game-based time windows (Last 5, Last 10) and per-mode filters (Per 36, Per 100 poss) that Yahoo does not natively support.
+HoopRadar is a Chromium MV3 extension that overlays advanced metrics (eFG%, TS%, USG%) from nba.com/stats onto Yahoo Fantasy Basketball pages, plus adds game-based time windows (Last 5, Last 10) and a Per 36 mode that Yahoo does not natively support.
 
 Tech stack: TypeScript (strict + `noUncheckedIndexedAccess`), Vite, `@crxjs/vite-plugin`, plain DOM plus shadow DOM for UI (no React, no chart libs, no custom elements), Vitest with `fake-indexeddb` for tests, GitHub Actions for CI.
 
@@ -115,7 +115,7 @@ The filter bar, cache keys, table columns, and tooltip rows all read from these 
 
 **Yahoo wraps each stat cell's value in a `<div>`.** Override the inner `<div>`'s `textContent`, not the `<td>`'s. Clobbering the cell directly removes the wrapper and breaks Yahoo's styling.
 
-**Ratio stats are scale-invariant across PerMode.** `EFG_PCT`, `TS_PCT`, `USG_PCT`, `FG_PCT`, `FT_PCT`, `FG3_PCT` are all ratios or per-possession rates. Changing `PerMode` (Per Game / Per 36 / Per 100) does not change their values, only counting stats (PTS, REB, AST, etc.) scale. nba.com returns identical numbers for these columns regardless of `PerMode`. This is correct behavior, not a bug. The window (Season / L5 / L10) does change them because the game sample changes.
+**Ratio stats are scale-invariant across PerMode.** `EFG_PCT`, `TS_PCT`, `USG_PCT`, `FG_PCT`, `FT_PCT`, `FG3_PCT` are all ratios or per-possession rates. Changing `PerMode` (Per Game / Per 36) does not change their values, only counting stats (PTS, REB, AST, etc.) scale. nba.com returns identical numbers for these columns regardless of `PerMode`. This is correct behavior, not a bug. The window (Season / L5 / L10) does change them because the game sample changes.
 
 **nba.com's `MeasureType=Advanced` ignores `PerMode` for counting stats.** A request with `PerMode=PerGame` against `MeasureType=Advanced` correctly honors PerMode for advanced fields (EFG_PCT, TS_PCT, USG_PCT, OFF_RATING, etc.) but returns season totals for the counting stats it incidentally includes (FGM, FGA, FTM, FTA, PTS, etc.). `MIN` is the exception: Advanced `MIN` is minutes per game, and it stays the same in every PerMode, whereas Base `MIN` scales with PerMode (verified live 2026-10-24). The shading's small-sample rule relies on this (`ADV_MIN` in `mergeStats.ts`). The `MeasureType=Base` request honors PerMode correctly for everything. The fix: when merging the two responses in `mergeBaseAndAdvanced` (`src/background/mergeStats.ts`), seed with Advanced first, then let Base overwrite on the overlap. Base wins on counting stats; Advanced's unique fields remain untouched.
 
@@ -126,7 +126,7 @@ The filter bar, cache keys, table columns, and tooltip rows all read from these 
 In scope:
 
 - The two Yahoo pages explicitly listed in the spec (`/team`, `/players`).
-- The three advanced columns (eFG%, TS%, USG%), three windows, three per-modes.
+- The three advanced columns (eFG%, TS%, USG%), three windows, two per-modes.
 - The hover-preview-plus-click-to-pin spider tooltip (Season, L10, L5 overlaid), which replaced the planned table tooltip.
 
 Deferred (v2 or later, listed in the spec's Future Work):

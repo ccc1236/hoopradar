@@ -1,3 +1,4 @@
+import { PER_MODES } from "./perModes.js";
 import type { PerModeKey, WindowKey } from "./types.js";
 
 export interface FilterSettings {
@@ -20,12 +21,17 @@ function hasDirectStorage(): boolean {
   );
 }
 
+/** A value saved by an older version (e.g. the removed Per 100) falls back to the default. */
+function sanitize(s: FilterSettings): FilterSettings {
+  return PER_MODES.some((m) => m.key === s.perMode) ? s : { ...s, perMode: DEFAULT_SETTINGS.perMode };
+}
+
 export async function loadSettings(): Promise<FilterSettings> {
   if (hasDirectStorage()) {
     const r = await chrome.storage.sync.get(KEY);
     const saved = r[KEY];
     if (!saved || typeof saved !== "object") return { ...DEFAULT_SETTINGS };
-    return { ...DEFAULT_SETTINGS, ...(saved as Partial<FilterSettings>) };
+    return sanitize({ ...DEFAULT_SETTINGS, ...(saved as Partial<FilterSettings>) });
   }
   // Fallback path: content script context where chrome.storage is not
   // accessible. Ask the SW to read it on our behalf.
@@ -34,7 +40,7 @@ export async function loadSettings(): Promise<FilterSettings> {
     settings?: FilterSettings;
   } | null;
   if (resp && resp.type === "getSettingsResponse" && resp.settings) {
-    return { ...DEFAULT_SETTINGS, ...resp.settings };
+    return sanitize({ ...DEFAULT_SETTINGS, ...resp.settings });
   }
   return { ...DEFAULT_SETTINGS };
 }

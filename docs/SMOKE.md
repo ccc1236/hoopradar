@@ -187,7 +187,7 @@ On any My Team or Players page, with a spider card pinned (click the player name
 2. Click each axis in turn. Confirm the bottom strip shows Rank (Nth of N), League avg, Player, Percentile, and that the clicked axis highlights.
 3. Click the active axis again. Confirm the strip collapses to the "Click an axis" placeholder.
 4. With the strip open, change the filter bar Window (Season / L5 / L10). Confirm the strip's numbers and the window label update with no page reload and no visible refetch flicker.
-5. Change the filter bar Per-mode (Per Game / Per 36 / Per 100). Confirm counting-stat rows (PTS, REB, etc.) rescale while ratio rows (TS%, USG%) hold steady, and the strip stays open.
+5. Change the filter bar Per-mode (Per Game / Per 36). Confirm counting-stat rows (PTS, REB, etc.) rescale while ratio rows (TS%, USG%) hold steady, and the strip stays open.
 6. Find a player with no L5 sample (recently returned from injury). Select L5, click an axis, confirm the strip shows "STAT - no L5 data".
 7. Hover a player name without pinning. Confirm clicking an axis on the hover-preview card does nothing (no strip).
 
@@ -198,7 +198,7 @@ Smoke-passes if all 7 steps succeed.
 1. On Players, eFG% and TS% cells show pastel fills from red through yellow (league average) to green. USG% cells show light to deeper blue. Text stays dark and readable on every fill.
 2. A low-minutes or rarely used player shows one small dark dot in the top-left of the USG% cell (not on eFG% or TS%). Hovering it reads like `Small sample: 2 of 12 team games, 6.0 MPG`.
 3. Switch Season, L10, L5: colours change (each window has its own baseline).
-4. Switch Per Game, Per 36, Per 100: colours and dots stay the same. If the shading disappears entirely in any PerMode (no fills, no dots), the Advanced minutes assumption is wrong: every player is being judged a small sample, which leaves no baseline (see the 2026-10-24 shading design).
+4. Switch Per Game, Per 36: colours and dots stay the same. If the shading disappears entirely in any PerMode (no fills, no dots), the Advanced minutes assumption is wrong: every player is being judged a small sample, which leaves no baseline (see the 2026-10-24 shading design).
 5. Unmapped players and players with no nba.com row show a plain `-` with no fill and no dot.
 6. Repeat 1 and 2 on My Team, Average Stats > current season.
 

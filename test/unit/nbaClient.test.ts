@@ -52,7 +52,7 @@ describe("fetchLeagueDashPlayerStats", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const rows = await fetchLeagueDashPlayerStats(
-      { season: "2025-26", measureType: "Base", perMode: "Per100Possessions", lastNGames: 0 },
+      { season: "2025-26", measureType: "Base", perMode: "Per36", lastNGames: 0 },
       { retryDelayMs: 0 },
     );
 

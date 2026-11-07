@@ -1,5 +1,5 @@
 export type WindowKey = "Season" | "Last5" | "Last10";
-export type PerModeKey = "PerGame" | "Per36" | "Per100Possessions";
+export type PerModeKey = "PerGame" | "Per36";
 export type MeasureType = "Base" | "Advanced";
 
 export type NbaPlayerId = number;
