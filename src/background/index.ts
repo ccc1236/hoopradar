@@ -29,10 +29,18 @@ import { loadSettings, saveSettings } from "../shared/settings.js";
 import type { PlayerStatRow, WindowKey, PerModeKey, YahooPlayerId } from "../shared/types.js";
 import { buildSpiderData } from "./spiderService.js";
 import { buildShadingPayload } from "./shadingBaseline.js";
+import { fetchPlayerGameLogs } from "./nbaGameLogs.js";
+import { createOwnWindowsStore, type OwnWindowsResult } from "./ownWindowsStore.js";
 import { log } from "../shared/logger.js";
 
 const cache = new Cache({ dbName: "hoopradar", defaultTtlMs: 6 * 60 * 60 * 1000 });
 const throttle = new Throttle({ intervalMs: 1100, cooldownMs: 60_000 });
+
+const ownWindows = createOwnWindowsStore({
+  cache,
+  fetchLogs: (season, measure) => throttle.run(() => fetchPlayerGameLogs(season, measure)),
+  onBlocked: () => throttle.triggerCooldown(),
+});
 
 const cacheKey = (req: GetPlayerStatsRequest, measure: "Base" | "Advanced", season: string): string =>
   `lps:${season}:${measure}:${req.perMode}:${windowByKey(req.window).lastNGames}`;
@@ -59,7 +67,14 @@ async function fetchWithCache(
   return rows;
 }
 
-async function fetchMergedForWindow(
+/** Season comes from leaguedashplayerstats. L5/L10 are each player's own games, never LastNGames. */
+async function fetchWindow(window: WindowKey, perMode: PerModeKey, forceFresh?: boolean): Promise<OwnWindowsResult> {
+  const lastN = windowByKey(window).lastNGames;
+  if (lastN > 0) return ownWindows.getRows(currentSeason(), lastN, perMode, forceFresh);
+  return { rows: await fetchSeasonRows(window, perMode, forceFresh), staleSince: null };
+}
+
+async function fetchSeasonRows(
   window: WindowKey,
   perMode: PerModeKey,
   forceFresh?: boolean,
@@ -85,7 +100,7 @@ async function handleGetPlayerStats(req: GetPlayerStatsRequest): Promise<MsgResp
     const mapping = await loadMapping(season);
     const yahooToNba = new Map(mapping.map((m) => [m.yahooId, m.nbaId]));
 
-    const rows = await fetchMergedForWindow(req.window, req.perMode, req.forceFresh);
+    const { rows, staleSince } = await fetchWindow(req.window, req.perMode, req.forceFresh);
     const byNbaId = new Map(rows.map((r) => [r.nbaId, r]));
 
     const byYahooId: Record<YahooPlayerId, PlayerStatRow | null> = {};
@@ -98,6 +113,7 @@ async function handleGetPlayerStats(req: GetPlayerStatsRequest): Promise<MsgResp
       type: "getPlayerStatsResponse",
       byYahooId,
       fetchedAt: Date.now(),
+      staleSince,
       shading: buildShadingPayload(rows, byYahooId),
     };
     return response;
@@ -167,7 +183,8 @@ async function handleGetSpiderData(
       yahooId: req.yahooId,
       perMode: req.perMode,
       mapping: map,
-      fetchMergedForWindow,
+      fetchMergedForWindow: async (window, perMode) => (await fetchWindow(window, perMode)).rows,
+      getLastPlayed: (nbaId) => ownWindows.getLastPlayed(season, nbaId),
     });
   } catch (e) {
     if (e instanceof RateLimitedError || e instanceof ThrottledError) {

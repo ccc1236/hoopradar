@@ -1,5 +1,6 @@
 import type { NbaPlayerId, PerModeKey, PlayerStatRow, WindowKey, YahooPlayerId } from "../shared/types.js";
 import type { GetSpiderDataResponse, RankingRecord, SpiderData, SpiderStatKey, WindowSlice } from "../shared/spider.js";
+import type { LastPlayed } from "../shared/lastPlayed.js";
 import { buildPercentileTable } from "./percentiles.js";
 import { leagueMean } from "./leagueAverages.js";
 
@@ -19,6 +20,7 @@ export interface BuildSpiderDataArgs {
   perMode: PerModeKey;
   mapping: ReadonlyMap<YahooPlayerId, NbaPlayerId>;
   fetchMergedForWindow: (window: WindowKey, perMode: PerModeKey) => Promise<readonly PlayerStatRow[]>;
+  getLastPlayed?: (nbaId: NbaPlayerId) => Promise<LastPlayed | null>;
 }
 
 export async function buildSpiderData(args: BuildSpiderDataArgs): Promise<GetSpiderDataResponse> {
@@ -66,6 +68,9 @@ export async function buildSpiderData(args: BuildSpiderDataArgs): Promise<GetSpi
     perMode: args.perMode,
     windows,
   };
+  // After the windows above, so a cold load has already saved it.
+  const lastPlayed = await args.getLastPlayed?.(nbaId);
+  if (lastPlayed) data.lastPlayed = lastPlayed;
   return { type: "getSpiderDataResponse", ok: true, data };
 }
 

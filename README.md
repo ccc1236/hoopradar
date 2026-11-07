@@ -32,7 +32,7 @@ A free Chrome extension that puts advanced stats on Yahoo Fantasy Basketball's *
 ## What it does
 
 - **Advanced columns, colour shaded.** eFG%, TS% and USG% appear under an "Advanced" header. eFG% and TS% are shaded from red (poor) through yellow (league average) to green (elite); USG% uses a blue scale, because high usage is a role, not good or bad. Small samples get a dot on the USG% cell.
-- **Last 5 / Last 10 games.** Windows count games the player actually played, unlike Yahoo's day-based filter.
+- **Last 5 / Last 10 games.** Each player's own last 5 or 10 games, however long ago those were, unlike Yahoo's day-based filter. If his last game is more than two weeks old, or his team has played 8+ games since, the radar card says when he last played.
 - **Per Game and Per 36.** Counting stats (PTS, REB, AST, ST, BLK, 3PTM, TO) rescale; ratios like FG% and TS% stay the same, as they should.
 - **Radar card.** Hover a player to compare their Season, L10 and L5 percentiles across nine stats; click to pin it, then click an axis for the stat's rank and league average.
 
@@ -82,7 +82,7 @@ Chromium browsers on desktop: Chrome, Edge and Brave. Not Firefox, Safari or mob
 <details>
 <summary><b>Why don't the numbers match Yahoo's?</b></summary>
 
-HoopRadar replaces Yahoo's displayed stats with nba.com numbers for the window and mode you pick. Yahoo's own Stats dropdown (Last 7 / 14 / 30 days) still works, but its picks are replaced after the page reloads. The two time concepts differ: Yahoo's filter is days, HoopRadar's is games the player actually appeared in. L5 and L10 are per player: someone who sat out three games gets L5 from their last five appearances.
+HoopRadar replaces Yahoo's displayed stats with nba.com numbers for the window and mode you pick. Yahoo's own Stats dropdown (Last 7 / 14 / 30 days) still works, but its picks are replaced after the page reloads. The two time concepts differ: Yahoo's filter is days, HoopRadar's is games the player actually appeared in. L5 and L10 are per player: someone who sat out three games still gets L5 from their last five appearances.
 </details>
 
 <details>

@@ -1,4 +1,5 @@
 import type { PerModeKey, YahooPlayerId } from "./types.js";
+import type { LastPlayed } from "./lastPlayed.js";
 
 export type SpiderStatKey =
   | "PTS"
@@ -39,6 +40,7 @@ export interface SpiderData {
   team: string;
   position: string;
   perMode: PerModeKey;
+  lastPlayed?: LastPlayed;
   windows: {
     season: WindowSlice | null;
     L10: WindowSlice | null;

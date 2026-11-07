@@ -1,5 +1,6 @@
 import { renderSpiderChart } from "./spider-chart.js";
 import { SPIDER_AXES, formatAxisValue } from "../shared/spiderAxes.js";
+import { lastPlayedText } from "../shared/lastPlayed.js";
 import type {
   GetSpiderDataRequest,
   GetSpiderDataResponse,
@@ -29,6 +30,7 @@ const STYLES = `
   }
   .name { font-weight: 600; font-size: 14px; }
   .sub  { color: #9CA3AF; font-size: 11px; margin-top: 1px; }
+  .last-played { color: #F59E0B; font-size: 11px; margin-top: 1px; }
   .close {
     background: none; border: none; color: #9CA3AF;
     font-size: 18px; cursor: pointer; line-height: 1; padding: 0; margin-top: -2px;
@@ -180,6 +182,14 @@ export function createSpiderTooltipController(deps: SpiderTooltipDeps): SpiderTo
     const name = root.querySelector('[data-role="name"]') as HTMLElement;
     name.textContent = data.name;
     sub.textContent  = `${data.team} · ${data.position} · ${perModeLabel(data.perMode)}`;
+    root.querySelector('[data-role="last-played"]')?.remove();
+    if (data.lastPlayed?.old) {
+      const line = document.createElement("div");
+      line.className = "last-played";
+      line.dataset["role"] = "last-played";
+      line.textContent = lastPlayedText(data.lastPlayed);
+      sub.after(line);
+    }
     const body = root.querySelector('[data-role="body"]') as HTMLElement;
     body.replaceChildren(renderSpiderChart(data, activeAxisKey));
     for (const slot of ["season", "L10", "L5"] as const) {

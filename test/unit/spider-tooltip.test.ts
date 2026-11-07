@@ -65,6 +65,26 @@ describe("spider tooltip controller", () => {
     target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
   }
 
+  async function openWith(data: SpiderData): Promise<ShadowRoot> {
+    send.mockResolvedValue({ type: "getSpiderDataResponse", ok: true, data });
+    mouseover();
+    await vi.advanceTimersByTimeAsync(300);
+    return document.querySelector(".hoopradar-spider-host")!.shadowRoot!;
+  }
+
+  it("shows the last played line when his last game is old", async () => {
+    const root = await openWith({ ...fullData, lastPlayed: { date: "2026-10-12T00:00:00", daysAgo: 21, teamGamesSince: 9, old: true } });
+    expect(root.querySelector('[data-role="last-played"]')!.textContent).toBe("Last played Oct 12 (3 weeks ago)");
+  });
+
+  it("shows no last played line for a recent game, or without the data", async () => {
+    const recent = await openWith({ ...fullData, lastPlayed: { date: "2026-11-05T00:00:00", daysAgo: 2, teamGamesSince: 1, old: false } });
+    expect(recent.querySelector('[data-role="last-played"]')).toBeNull();
+    controller.onPerModeChange();
+    const absent = await openWith(fullData);
+    expect(absent.querySelector('[data-role="last-played"]')).toBeNull();
+  });
+
   it("does not mount a card on bare mouseover before 300ms", () => {
     mouseover();
     vi.advanceTimersByTime(200);

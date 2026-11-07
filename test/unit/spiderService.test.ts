@@ -31,6 +31,20 @@ describe("buildSpiderData", () => {
     expect(out).toEqual({ type: "getSpiderDataResponse", ok: false, reason: "fetch-failed" });
   });
 
+  it("adds last played when it is available", async () => {
+    const lastPlayed = { date: "2026-10-12T00:00:00", daysAgo: 21, teamGamesSince: 9, old: true };
+    const fetcher = vi.fn().mockResolvedValue([row(1, "A. Player", "PHX", { PTS: 20 })]);
+    const args = { yahooId: "5", perMode: "PerGame" as const, mapping: new Map([["5", 1]]), fetchMergedForWindow: fetcher };
+
+    const withIt = await buildSpiderData({ ...args, getLastPlayed: async () => lastPlayed });
+    if (!withIt.ok) throw new Error("unreachable");
+    expect(withIt.data.lastPlayed).toEqual(lastPlayed);
+
+    const without = await buildSpiderData({ ...args, getLastPlayed: async () => null });
+    if (!without.ok) throw new Error("unreachable");
+    expect(without.data.lastPlayed).toBeUndefined();
+  });
+
   it("returns ok=true with all three slices when fetches succeed", async () => {
     const player = (pts: number) =>
       row(1, "A. Player", "PHX", {

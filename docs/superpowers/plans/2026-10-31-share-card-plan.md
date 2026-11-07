@@ -1,5 +1,7 @@
 # Share Card Implementation Plan
 
+> **Update before building (2026-11-07):** L5 and L10 became each player's own last games, and Per 100 was removed. So the small-sample chip now only fires for players with fewer total games, the Per mode chip has two values, `SpiderData` now carries `lastPlayed`, and a last-played chip is needed. Revise Task 2 accordingly.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add Copy image and Download PNG actions to the pinned spider card, producing a 1200x675 (2x) share image that makes one headline point about a player's recent form.

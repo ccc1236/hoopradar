@@ -20,6 +20,8 @@ export interface GetPlayerStatsResponse {
   type: "getPlayerStatsResponse";
   byYahooId: Record<YahooPlayerId, PlayerStatRow | null>;
   fetchedAt: number;
+  /** When the L5/L10 rows were downloaded, if a newer download failed. Null when current. */
+  staleSince: number | null;
   /** League baseline and per-player sample info for the shaded advanced columns. */
   shading: ShadingPayload;
 }

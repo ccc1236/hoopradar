@@ -1,5 +1,6 @@
 import { scrapePlayers, findStatsTable, cellAtColumn, columnOf } from "../content/yahoo.js";
 import { renderColumns, clearHoopradarCells } from "../content/injectColumns.js";
+import { loadingText, updatedText } from "./statusText.js";
 import { createFilterBar, type FilterBarHandle } from "../ui/filter-bar.js";
 import { createSpiderTooltipController, type SpiderTooltipHandle } from "../ui/spider-tooltip.js";
 import type { PageInfo } from "../content/pageDetect.js";
@@ -207,7 +208,7 @@ function reSortBy(table: HTMLTableElement, sort: SortInfo): void {
 }
 
 async function paint(table: HTMLTableElement, bar: FilterBarHandle, settings: FilterSettings): Promise<void> {
-  bar.setStatus("Loading...");
+  bar.setStatus(loadingText(settings.window));
   const players = scrapePlayers();
   if (players.length === 0) {
     bar.setStatus("No players found on this page", "error");
@@ -235,7 +236,7 @@ async function paint(table: HTMLTableElement, bar: FilterBarHandle, settings: Fi
   }
   renderColumns(table, resp.byYahooId, resp.shading);
   if (sortInfo) reSortBy(table, sortInfo);
-  bar.setStatus(`Updated ${new Date().toLocaleTimeString()}`);
+  bar.setStatus(updatedText(resp, new Date()), resp.staleSince === null ? "ok" : "error");
 }
 
 export async function run(_info: PageInfo): Promise<{ teardown: () => void }> {
@@ -312,7 +313,7 @@ export async function run(_info: PageInfo): Promise<{ teardown: () => void }> {
     }
     renderColumns(table, r.byYahooId, r.shading);
     if (sortInfo) reSortBy(table, sortInfo);
-    bar.setStatus(`Updated ${new Date().toLocaleTimeString()}`);
+    bar.setStatus(updatedText(r, new Date()), r.staleSince === null ? "ok" : "error");
   };
 
   bar.addEventListener("hoopradar-filter-change", onChange);

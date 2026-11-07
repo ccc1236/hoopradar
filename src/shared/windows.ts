@@ -3,7 +3,7 @@ import type { WindowKey } from "./types.js";
 export interface WindowDef {
   key: WindowKey;
   label: string;
-  /** nba.com `LastNGames` param. 0 = season-long. */
+  /** How many of the player's own latest games the window covers. 0 = season-long. */
   lastNGames: number;
 }
 

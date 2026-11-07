@@ -202,6 +202,14 @@ Smoke-passes if all 7 steps succeed.
 5. Unmapped players and players with no nba.com row show a plain `-` with no fill and no dot.
 6. Repeat 1 and 2 on My Team, Average Stats > current season.
 
+## 13. Own-game L5 and L10
+
+1. Pick a player who has missed recent team games. His L5 numbers match the average of his own last 5 games on his nba.com game log, not his team's last 5.
+2. In the service worker console, `hoopradar.getPlayerStats({ type: "getPlayerStats", yahooIds: ["<id>"], window: "Last5", perMode: "PerGame" })` shows `GP` 5 on his row (when he has 5+ games).
+3. Switch L5, L10, Per Game, Per 36: numbers update, shading and radar work, and only the first L5/L10 load of the session shows "Loading game logs...".
+4. Open the radar card of a player out for more than two weeks. Under the name: `Last played <date> (<n> weeks ago)`, with his numbers still shown. A player who played recently has no such line.
+5. Offline test: load L5 once, wait for the data to age or clear only the network (DevTools, service worker, Offline), click Refresh. The filter bar reads `Couldn't update. Showing data from <date>` and the numbers stay.
+
 ## Known limitations (current build)
 
 - **eFG% / TS% / USG% are not sortable.** Clicking those headers does nothing. Sort applies only to Yahoo's native columns. Deferred indefinitely; see `docs/ROADMAP.md`.
