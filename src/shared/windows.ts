@@ -9,8 +9,8 @@ export interface WindowDef {
 
 export const WINDOWS: WindowDef[] = [
   { key: "Season", label: "Season", lastNGames: 0 },
-  { key: "Last5", label: "L5", lastNGames: 5 },
   { key: "Last10", label: "L10", lastNGames: 10 },
+  { key: "Last5", label: "L5", lastNGames: 5 },
 ];
 
 export function windowByKey(key: WindowKey): WindowDef {

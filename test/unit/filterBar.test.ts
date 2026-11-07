@@ -20,6 +20,11 @@ describe("filter bar", () => {
     expect(sr.querySelector('button[data-role="refresh"]')).not.toBeNull();
   });
 
+  it("lists the windows as Season, L10, L5", () => {
+    const options = bar.shadowRoot!.querySelectorAll('select[data-role="window"] option');
+    expect(Array.from(options, (o) => o.textContent)).toEqual(["Season", "L10", "L5"]);
+  });
+
   it("emits hoopradar-filter-change with the new selection on window change", async () => {
     const sr = bar.shadowRoot!;
     const sel = sr.querySelector<HTMLSelectElement>('select[data-role="window"]')!;
