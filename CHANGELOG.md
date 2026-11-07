@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.7 - 2026-11-07
+
+Small wording fix.
+
+- The small-sample hover now reads `Small sample: 2 games, 6.0 MPG`. It used to say "of 5 team games", but in L5 and L10 that number had become the window size rather than a team game count.
+
 ## v0.2.6 - 2026-11-07
 
 L5 and L10 are now each player's own last games, and Per 100 is gone.
