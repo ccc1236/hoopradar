@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.6 - 2026-11-07
+
+L5 and L10 are now each player's own last games, and Per 100 is gone.
+
+- L5 and L10 used nba.com's "last N games" setting, which means the team's last games, so a player who sat out 2 of his team's last 5 got an L5 built from 3 games. They are now his own last 5 and 10 games, however long ago those were, across the table, shading and radar card. The numbers come from nba.com's league-wide game logs and are calculated locally: percentages from totals, USG% weighted by possessions.
+- The radar card shows a line like `Last played Oct 12 (3 weeks ago)` when his last game is more than two weeks old, or his team has played 8 or more games since.
+- Per 100 is removed. A saved Per 100 setting falls back to Per Game.
+- If a game log download fails, the last good numbers stay and the filter bar reads `Couldn't update. Showing data from Nov 3`. Failed downloads wait 5 minutes before trying again, except on Refresh, and a 403 or 429 is never retried.
+- A slow response can no longer overwrite the table after you have switched to another window.
+- The dropdown now reads Season, L10, L5.
+
 ## v0.2.5 - 2026-10-24
 
 New: colour shading on the eFG%, TS% and USG% columns, on Players and on My Team.
